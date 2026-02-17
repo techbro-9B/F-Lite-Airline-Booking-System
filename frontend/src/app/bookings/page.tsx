@@ -23,15 +23,15 @@ const bookingsList: Booking[] = [
   { location: "Nevada", seats: 60, departure: 1, cost: 900 },
   { location: "Narnia", seats: 60, departure: 5, cost: 900 },
   { location: "School", seats: 60, departure: 5, cost: 900 },
-  { location: "Epstien Island", seats: 60, departure: 16, cost: 900 },
+  { location: "Yepsteen Island", seats: 60, departure: 16, cost: 900 },
   { location: "CCP County", seats: 60, departure: 16, cost: 900 },
-  { location: "Epstien Island 1", seats: 120, departure: 3, cost: 450 },
-  { location: "Epstien Island 2", seats: 200, departure: 3, cost: 450 },
-  { location: "Epstien Island 3", seats: 300, departure: 3, cost: 450 },
-  { location: "Epstien Island 4", seats: 400, departure: 3, cost: 450 },
-  { location: "Epstien Island 5", seats: 0, departure: 3, cost: 450 },
-  { location: "Epstien Island 6", seats: 0, departure: 3, cost: 450 },
-  { location: "Epstien Island 6", seats: 0, departure: 3, cost: 450 },
+  { location: "Tokyo", seats: 0, departure: 16, cost: 900 },
+  { location: "The Sun", seats: 0, departure: 16, cost: 1434 },
+  { location: "188 Pearson Lane", seats: 60, departure: 16, cost: 900 },
+  { location: "1881 Pearson Lane", seats: 60, departure: 16, cost: 900 },
+  { location: "18811 Pearson Lane", seats: 60, departure: 6, cost: 900 },
+  { location: "188111 Pearson Lane", seats: 0, departure: 2, cost: 900 },
+  { location: "Suspicious Island With Apparently No Files", seats: 0, departure: 2, cost: 900 },
 ];
 
 export default function BookingsPage() {
@@ -71,7 +71,7 @@ export default function BookingsPage() {
           <CardTitle>Filters</CardTitle>
         </CardHeader>
 
-        <CardContent className="flex flex-col gap-7 list-none">
+        <CardContent className="flex flex-col gap-7 list-none overflow-y-auto">
           <li>
             <Label htmlFor="name">Name</Label>
             <Input
