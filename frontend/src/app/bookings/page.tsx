@@ -37,8 +37,8 @@ const bookingsList: Booking[] = [
   { location: "188 Pearson Lane", seats: 60, departure: 16, cost: 900 },
   { location: "1881 Pearson Lane", seats: 60, departure: 16, cost: 900 },
   { location: "18811 Pearson Lane", seats: 60, departure: 6, cost: 900 },
-  { location: "188111 Pearson Lane", seats: 0, departure: 2, cost: 900 },
-  { location: "Suspicious Island With Apparently No Files", seats: 0, departure: 2, cost: 900 },
+  { location: "188111 Pearson Lane", seats: 0, departure: 2, cost: 1500 },
+  { location: "Suspicious Island With Apparently No Files", seats: 0, departure: 2, cost: 3 },
 ];
 
 export default function BookingsPage() {
@@ -159,7 +159,7 @@ export default function BookingsPage() {
           </li>
 
           <li>
-            <Label htmlFor="category">Category</Label>
+            <Label htmlFor="category">Category [In Progress]</Label>
             <Select>
               <SelectTrigger className="w-full mt-2">
                 <SelectValue placeholder="Select a thing"/>
