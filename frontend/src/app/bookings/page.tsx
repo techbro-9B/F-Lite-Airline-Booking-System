@@ -25,13 +25,13 @@ const bookingsList: Booking[] = [
   { location: "School", seats: 60, departure: 5, cost: 900 },
   { location: "Epstien Island", seats: 60, departure: 16, cost: 900 },
   { location: "CCP County", seats: 60, departure: 16, cost: 900 },
-  { location: "Epstien Island 1", seats: 120, departure: 3, cost: 450 },
-  { location: "Epstien Island 2", seats: 200, departure: 3, cost: 450 },
-  { location: "Epstien Island 3", seats: 300, departure: 3, cost: 450 },
-  { location: "Epstien Island 4", seats: 400, departure: 3, cost: 450 },
-  { location: "Epstien Island 5", seats: 0, departure: 3, cost: 450 },
-  { location: "Epstien Island 6", seats: 0, departure: 3, cost: 450 },
-  { location: "Epstien Island 6", seats: 0, departure: 3, cost: 450 },
+  { location: "St Barts Island", seats: 120, departure: 3, cost: 450 },
+  { location: "St Thomas", seats: 200, departure: 3, cost: 450 },
+  { location: "Toronto", seats: 300, departure: 3, cost: 450 },
+  { location: "Kampala", seats: 400, departure: 3, cost: 450 },
+  { location: "Shanghai", seats: 0, departure: 3, cost: 450 },
+  { location: "Bhatum", seats: 0, departure: 3, cost: 450 },
+  { location: "New Delhi", seats: 0, departure: 3, cost: 450 },
 ];
 
 export default function BookingsPage() {
