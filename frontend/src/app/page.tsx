@@ -4,6 +4,7 @@ import { HomeNavBar } from "./homepage/components/HomeNavBar";
 import AboutUs from "./homepage/components/AboutUs";
 import WhereWeFly from "./homepage/components/WhereWeFly";
 import Footer from "./homepage/components/Footer";
+import Testimonials from "./homepage/components/Testimonials";
 export default function Home() {
   return (
     <>
@@ -12,8 +13,11 @@ export default function Home() {
 
     <HeroSection/>
     <AboutUs/>
-    <WhereWeFly/> 
-    <Footer/>
+    <Testimonials/>
+
+    {/* irrelevant for sprint 1 */}
+    {/* <WhereWeFly/> 
+    <Footer/> */}
       
     </>
   );
