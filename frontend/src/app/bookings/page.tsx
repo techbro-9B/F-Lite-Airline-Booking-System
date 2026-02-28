@@ -1,5 +1,6 @@
 "use client";
 
+import { createClient } from '@supabase/supabase-js'
 import "@/app/globals.css";
 import {Label} from "@/components/ui/label"
 import { useState, useMemo } from "react";
@@ -8,6 +9,18 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription} from "@/comp
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel} from "@/components/ui/select";
 import * as Slider from "@radix-ui/react-slider";
 import { Switch } from "@/components/ui/switch";
+
+// loading plane snapshot from supabase
+const supabaseUrl = 'https://mmclsfzzxjemuuacrewm.supabase.co'
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1tY2xzZnp6eGplbXV1YWNyZXdtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0ODUwMjksImV4cCI6MjA4NjA2MTAyOX0.bE6b2XXYlghLYIC4pQxmlGfRC3Q4Lfl93lu2B3ikm7A'
+
+const supabase = createClient(supabaseUrl, supabaseKey)
+
+const { data, error } = await supabase
+  .from('flights')
+  .select('*')
+
+console.log(data)
 
 type Booking = {
   location: string;
