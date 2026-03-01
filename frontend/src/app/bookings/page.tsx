@@ -16,11 +16,14 @@ const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 
 const supabase = createClient(supabaseUrl, supabaseKey)
 
-const { data, error } = await supabase
+const { data: flightData, error: flightError } = await supabase
   .from('flights')
   .select('*')
+const { data: planesData, error: planesError } = await supabase
+  .from('planes')
+  .select('*')
 
-console.log(data)
+console.log(flightData, planesData)
 
 type Booking = {
   location: string;
