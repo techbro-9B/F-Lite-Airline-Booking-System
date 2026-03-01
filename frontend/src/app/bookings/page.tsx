@@ -163,7 +163,7 @@ export default function BookingsPage() {
         Next: filter by which day to depart
         */
       }
-      <Card className="absolute bottom-[2rem] bg-[var(--card)] left-[2rem] w-[calc(35%-3rem)] h-[calc(70%-4rem)] shadow-[0_10px_25px_rgba(0,0,0,0.3)]">
+      <Card className="absolute bottom-[2rem] bg-[var(--card)] left-[2rem] w-[calc(35%-3rem)] h-[calc(70%-4rem)]">
         <CardHeader>
           <CardTitle>Filters</CardTitle>
         </CardHeader>
@@ -258,7 +258,7 @@ export default function BookingsPage() {
         Sorting available when you click on the "seats", "departure", or "cost" buttons
         */
       }
-      <Card className="absolute top-[2rem] bg-[var(--card)] right-[2rem] w-[calc(65%-3rem)] h-[calc(100%-4rem)] shadow-[0_10px_25px_rgba(0,0,0,0.3)]">
+      <Card className="absolute top-[2rem] bg-[var(--card)] right-[2rem] w-[calc(65%-3rem)] h-[calc(100%-4rem)]">
         <CardContent className="relative">
           <CardTitle className="text-lg font-bold">Bookings Overview</CardTitle>
         </CardContent>
@@ -320,7 +320,7 @@ export default function BookingsPage() {
           {filteredBookings.map((booking, idx) => (
             <div
               key={idx}
-              className="flex items-center gap-x-3 px-10 bg-gray-100 rounded-xl bg-gray bg-white transition py-2 shadow-[0_0px_3px_rgba(0,0,0,0.05)] border border-gray-200"
+              className="flex items-center gap-x-3 px-10 bg-gray-100 hover:bg-gray-100 rounded-xl bg-gray bg-white transition py-2 shadow-[0_0px_3px_rgba(0,0,0,0.05)] border border-gray-200"
             >
               <span className="w-[20px] truncate text-center font-medium text-gray-800">{booking.flightId}</span>
               <span className="w-[100px] truncate text-center font-medium text-gray-800">{booking.planeName}</span>
