@@ -23,39 +23,60 @@ const { data: planesData, error: planesError } = await supabase
   .from('planes')
   .select('*')
 
-console.log(flightData, planesData)
+// creating plane lookup table
+const planeLookup: { [planeId: number]: {name: string, seats: number} } = {}
+console.log(planesData)
+planesData?.forEach((plane) => {
+  planeLookup[plane.plane_id] = {
+    name: plane.plane_name, seats: plane.total_seats
+  }
+})
 
+// creating bookings list
 type Booking = {
   location: string;
   seats: number;
   departure: number;
+  departureFormattedDate: string;
   cost: number;
 };
+const bookingsList: Booking[] = [];
+flightData?.forEach((flight) => {
+  console.log(flight);
+  const newDate = new Date(flight.departure)
+  bookingsList.push({
+    location: flight.destination,
+    seats: planeLookup[flight.plane_id].seats,
+    departure: Math.ceil((newDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)),
+    departureFormattedDate: `${String(newDate.getMonth() + 1).padStart(2, '0')}/${String(newDate.getDate()).padStart(2, '0')}/${newDate.getFullYear()}`,
+    cost: flight.cost,
+  })
+})
 
-const bookingsList: Booking[] = [
-  { location: "New York", seats: 120, departure: 3, cost: 450 },
-  { location: "Los Angeles", seats: 85, departure: 2, cost: 380},
-  { location: "Chicago", seats: 60, departure: 1, cost: 900 },
-  { location: "Nevada", seats: 60, departure: 1, cost: 900 },
-  { location: "Narnia", seats: 60, departure: 5, cost: 900 },
-  { location: "School", seats: 60, departure: 5, cost: 900 },
-  { location: "Yepsteen Island", seats: 60, departure: 16, cost: 900 },
-  { location: "CCP County", seats: 60, departure: 16, cost: 900 },
-  { location: "St Barts Island", seats: 120, departure: 3, cost: 450 },
-  { location: "St Thomas", seats: 200, departure: 3, cost: 450 },
-  { location: "Toronto", seats: 300, departure: 3, cost: 450 },
-  { location: "Kampala", seats: 400, departure: 3, cost: 450 },
-  { location: "Shanghai", seats: 0, departure: 3, cost: 450 },
-  { location: "Bhatum", seats: 0, departure: 3, cost: 450 },
-  { location: "New Delhi", seats: 0, departure: 3, cost: 450 },
-  { location: "Tokyo", seats: 0, departure: 16, cost: 900 },
-  { location: "The Sun", seats: 0, departure: 16, cost: 1434 },
-  { location: "188 Pearson Lane", seats: 60, departure: 16, cost: 900 },
-  { location: "1881 Pearson Lane", seats: 60, departure: 16, cost: 900 },
-  { location: "18811 Pearson Lane", seats: 60, departure: 6, cost: 900 },
-  { location: "188111 Pearson Lane", seats: 0, departure: 2, cost: 1500 },
-  { location: "Suspicious Island With Apparently No Files", seats: 0, departure: 2, cost: 3 },
-];
+// const bookingsList: Booking[] = [
+//   { location: "New York", seats: 120, departure: 3, cost: 450 },
+//   { location: "Los Angeles", seats: 85, departure: 2, cost: 380},
+//   { location: "Chicago", seats: 60, departure: 1, cost: 900 },
+//   { location: "Nevada", seats: 60, departure: 1, cost: 900 },
+//   { location: "Narnia", seats: 60, departure: 5, cost: 900 },
+//   { location: "School", seats: 60, departure: 5, cost: 900 },
+//   { location: "Yepsteen Island", seats: 60, departure: 16, cost: 900 },
+//   { location: "CCP County", seats: 60, departure: 16, cost: 900 },
+//   { location: "St Barts Island", seats: 120, departure: 3, cost: 450 },
+//   { location: "St Thomas", seats: 200, departure: 3, cost: 450 },
+//   { location: "Toronto", seats: 300, departure: 3, cost: 450 },
+//   { location: "Kampala", seats: 400, departure: 3, cost: 450 },
+//   { location: "Shanghai", seats: 0, departure: 3, cost: 450 },
+//   { location: "Bhatum", seats: 0, departure: 3, cost: 450 },
+//   { location: "New Delhi", seats: 0, departure: 3, cost: 450 },
+//   { location: "Tokyo", seats: 0, departure: 16, cost: 900 },
+//   { location: "The Sun", seats: 0, departure: 16, cost: 1434 },
+//   { location: "188 Pearson Lane", seats: 60, departure: 16, cost: 900 },
+//   { location: "1881 Pearson Lane", seats: 60, departure: 16, cost: 900 },
+//   { location: "18811 Pearson Lane", seats: 60, departure: 6, cost: 900 },
+//   { location: "188111 Pearson Lane", seats: 0, departure: 2, cost: 1500 },
+//   { location: "Suspicious Island With Apparently No Files", seats: 0, departure: 2, cost: 3 },
+// ];
 
 export default function BookingsPage() {
   const [priceFilter, setPriceFilter] = useState<[number, number]>([0, 1500]);
@@ -203,7 +224,7 @@ export default function BookingsPage() {
         className="ml-3 mr-3 flex justify-between items-center px-4 py-2s"
       >
         <span className="w-1/4 text-left font-bold text-gray-800">Location</span>
-        <span className="w-1/4 text-left font-bold font-boldtext-gray-700">seats</span>
+        <span className="w-1/4 text-left font-bold font-boldtext-gray-700">Seats</span>
         <span className="w-1/4 text-left font-bold text-gray-700">Departure</span>
         <span className="w-1/4 text-right font-bold text-gray-900">Cost</span>
       </div>
@@ -215,7 +236,7 @@ export default function BookingsPage() {
           >
             <span className="w-1/4 text-left font-medium text-gray-800">{booking.location}</span>
             <span className="w-1/4 text-left text-gray-700">{booking.seats} seats</span>
-            <span className="w-1/4 text-left text-gray-700">In {booking.departure} day(s)</span>
+            <span className="w-1/4 text-left text-gray-700">{booking.departureFormattedDate} → In {booking.departure} day(s)</span>
             <span className="w-1/4 text-right font-semibold text-gray-900">${booking.cost}</span>
           </div>
         ))}
