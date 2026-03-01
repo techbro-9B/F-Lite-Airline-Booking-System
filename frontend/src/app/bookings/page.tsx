@@ -1,3 +1,21 @@
+/*
+
+READ ME README
+
+
+YES THE CODE IS MESSY
+
+YES I WILL ADD COMMENTS
+
+BUT NOT NOWWWWWWWWWWWWWWWW
+
+
+let's get it to work and look a little decent first, then iterate through the code and clean it
+up
+
+*/
+
+
 "use client";
 
 import { createClient } from '@supabase/supabase-js'
@@ -8,7 +26,7 @@ import {Input} from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription} from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel} from "@/components/ui/select";
 import * as Slider from "@radix-ui/react-slider";
-import { Switch } from "@/components/ui/switch";
+import { Button } from "@/components/ui/button";
 
 // loading plane snapshot from supabase
 const supabaseUrl = 'https://mmclsfzzxjemuuacrewm.supabase.co'
@@ -38,7 +56,9 @@ type Booking = {
   seats: number;
   departure: number;
   departureFormattedDate: string;
+  planeName: string;
   cost: number;
+  flightId: number;
 };
 const bookingsList: Booking[] = [];
 flightData?.forEach((flight) => {
@@ -50,44 +70,44 @@ flightData?.forEach((flight) => {
     departure: Math.ceil((newDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)),
     departureFormattedDate: `${String(newDate.getMonth() + 1).padStart(2, '0')}/${String(newDate.getDate()).padStart(2, '0')}/${newDate.getFullYear()}`,
     cost: flight.cost,
+    planeName: planeLookup[flight.plane_id].name,
+    flightId: flight.flight_id,
   })
 })
 
-// const bookingsList: Booking[] = [
-//   { location: "New York", seats: 120, departure: 3, cost: 450 },
-//   { location: "Los Angeles", seats: 85, departure: 2, cost: 380},
-//   { location: "Chicago", seats: 60, departure: 1, cost: 900 },
-//   { location: "Nevada", seats: 60, departure: 1, cost: 900 },
-//   { location: "Narnia", seats: 60, departure: 5, cost: 900 },
-//   { location: "School", seats: 60, departure: 5, cost: 900 },
-//   { location: "Yepsteen Island", seats: 60, departure: 16, cost: 900 },
-//   { location: "CCP County", seats: 60, departure: 16, cost: 900 },
-//   { location: "St Barts Island", seats: 120, departure: 3, cost: 450 },
-//   { location: "St Thomas", seats: 200, departure: 3, cost: 450 },
-//   { location: "Toronto", seats: 300, departure: 3, cost: 450 },
-//   { location: "Kampala", seats: 400, departure: 3, cost: 450 },
-//   { location: "Shanghai", seats: 0, departure: 3, cost: 450 },
-//   { location: "Bhatum", seats: 0, departure: 3, cost: 450 },
-//   { location: "New Delhi", seats: 0, departure: 3, cost: 450 },
-//   { location: "Tokyo", seats: 0, departure: 16, cost: 900 },
-//   { location: "The Sun", seats: 0, departure: 16, cost: 1434 },
-//   { location: "188 Pearson Lane", seats: 60, departure: 16, cost: 900 },
-//   { location: "1881 Pearson Lane", seats: 60, departure: 16, cost: 900 },
-//   { location: "18811 Pearson Lane", seats: 60, departure: 6, cost: 900 },
-//   { location: "188111 Pearson Lane", seats: 0, departure: 2, cost: 1500 },
-//   { location: "Suspicious Island With Apparently No Files", seats: 0, departure: 2, cost: 3 },
-// ];
+// sort arrow function class
+function SortArrow({
+  active,
+  ascending,
+}: {
+  active: boolean
+  ascending: boolean | null
+}) {
+  if (!active) {
+    return <span className="opacity-30">↕</span>
+  }
+
+  return (
+    <span className="ml">
+      {ascending ? "↑" : "↓"}
+    </span>
+  )
+}
 
 export default function BookingsPage() {
   const [priceFilter, setPriceFilter] = useState<[number, number]>([0, 1500]);
-  const [departureFilter, setDepartureFilter] = useState<[number, number]>([0, 90]);
-  const [nameFilter, setNameFilter] = useState<string>("");
+  const [departureFilter, setDepartureFilter] = useState<[number, number]>([0, 365]);
+  const [locationFilter, setLocationFilter] = useState<string>("");
   const [seatsFilter, setSeatsFilter] = useState<[number, number]>([0, 500]);
 
+  // filtering and sorting bookings
+  const [sortSetting, setSortSetting] = useState<{category: "cost" | "departure" | "seats" | null, ascending: boolean | null}>({category: null, ascending: null})
+
   const filteredBookings = useMemo(() => {
-    return bookingsList.filter((b) => {
+    // filtering
+    let filtered = bookingsList.filter((b) => {
       const matchesName =
-        b.location.toLowerCase().includes(nameFilter.toLowerCase());
+        b.location.toLowerCase().includes(locationFilter.toLowerCase());
 
       const matchesDeparture =
         b.departure >= departureFilter[0] && b.departure <= departureFilter[1];
@@ -100,7 +120,28 @@ export default function BookingsPage() {
 
       return matchesName && matchesDeparture && matchesPrice && matchesSeats;
     });
-  }, [nameFilter, departureFilter, priceFilter, seatsFilter]);
+
+    // sorting
+    filtered.sort((a, b) => {
+        const modifier = sortSetting.ascending ? 1 : -1
+
+        if (sortSetting.category === "cost") {
+          return (a.cost - b.cost) * modifier
+        }
+
+        if (sortSetting.category === "departure") {
+          return (a.departure - b.departure) * modifier
+        }
+
+        if (sortSetting.category === "seats") {
+          return (a.seats - b.seats) * modifier
+        }
+
+        return 0
+      })
+
+    return filtered
+  }, [locationFilter, departureFilter, priceFilter, seatsFilter, sortSetting]);
 
   return (
     <div className = "w-screen h-screen" style={{ background: "var(--background)" }}>
@@ -110,19 +151,29 @@ export default function BookingsPage() {
       <Label className="text-m absolute left-[4rem] top-[calc(12rem)] w-[calc(35%-6rem)] text-[var(--foreground)]">
         To book a flight, use the filters and choose your desired flight on the card on the right.
       </Label>
+
+
+
+      {
+        /*
+        Filters
+        Controls what elements get shown
+        Current filters: name, cost, maximum departure, seats remaining
+
+        Next: filter by which day to depart
+        */
+      }
       <Card className="absolute bottom-[2rem] bg-[var(--card)] left-[2rem] w-[calc(35%-3rem)] h-[calc(70%-4rem)] shadow-[0_10px_25px_rgba(0,0,0,0.3)]">
         <CardHeader>
           <CardTitle>Filters</CardTitle>
         </CardHeader>
-
         <CardContent className="flex flex-col gap-7 list-none overflow-y-auto">
           <li>
-            <Label htmlFor="name">Name</Label>
+            <Label htmlFor="location">Location</Label>
             <Input
-              id="name"
-              placeholder="Enter name"
+              id="location"
               className="mt-3"
-              onChange={(e) => setNameFilter(e.target.value)}
+              onChange={(e) => setLocationFilter(e.target.value)}
             />
           </li>
 
@@ -153,10 +204,10 @@ export default function BookingsPage() {
             <Label htmlFor="departure">Departure</Label>
             <Slider.Root
               className="relative flex w-full select-none touch-none mt-3 items-center"
-              defaultValue={[0, 90]}
+              defaultValue={[0, 365]}
               onValueChange={(val) => setDepartureFilter(val as [number, number])}
               min={0}
-              max={90}
+              max={365}
               step={1}
             >
               <Slider.Track className="bg-gray-300 relative flex-1 h-2 rounded-full">
@@ -194,53 +245,92 @@ export default function BookingsPage() {
               Has {seatsFilter[0]} to {seatsFilter[1]} seats
             </div>
           </li>
-
-          <li>
-            <Label htmlFor="category">Category [In Progress]</Label>
-            <Select>
-              <SelectTrigger className="w-full mt-2">
-                <SelectValue placeholder="Select a thing"/>
-              </SelectTrigger>
-              <SelectContent className="bg-white">
-                <SelectGroup>
-                  <SelectLabel>Stuff</SelectLabel>
-                    <SelectItem value="apple">Apple</SelectItem>
-                    <SelectItem value="banana">Banana</SelectItem>
-                    <SelectItem value="blueberry">Blueberry</SelectItem>
-                    <SelectItem value="grapes">Grapes</SelectItem>
-                    <SelectItem value="pineapple">Pineapple</SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </li>
         </CardContent>
       </Card>
-      <Card className="absolute top-[2rem] bg-[var(--card)] right-[2rem] w-[calc(65%-3rem)] h-[calc(100%-4rem)] shadow-[0_10px_25px_rgba(0,0,0,0.3)]">
-        <CardHeader>
-        <CardTitle className="text-lg font-semibold">Bookings Overview</CardTitle>
-      </CardHeader>
 
-      <div
-        className="ml-3 mr-3 flex justify-between items-center px-4 py-2s"
-      >
-        <span className="w-1/4 text-left font-bold text-gray-800">Location</span>
-        <span className="w-1/4 text-left font-bold font-boldtext-gray-700">Seats</span>
-        <span className="w-1/4 text-left font-bold text-gray-700">Departure</span>
-        <span className="w-1/4 text-right font-bold text-gray-900">Cost</span>
-      </div>
-      <CardContent className="space-y-3 overflow-y-auto">
-        {filteredBookings.map((booking, idx) => (
+
+
+      {
+        /*
+        The actual flight content
+        Displays flight id, plane name, location, seats remaining, departure date and relative time, and cost
+
+        Sorting available when you click on the "seats", "departure", or "cost" buttons
+        */
+      }
+      <Card className="absolute top-[2rem] bg-[var(--card)] right-[2rem] w-[calc(65%-3rem)] h-[calc(100%-4rem)] shadow-[0_10px_25px_rgba(0,0,0,0.3)]">
+        <CardContent className="relative">
+          <CardTitle className="text-lg font-bold">Bookings Overview</CardTitle>
+        </CardContent>
+
+        {
+          /*
+          This is where the titles are displayed
+          */
+        }
+        <CardContent className="relative">
           <div
-            key={idx}
-            className="flex justify-between items-center bg-gray-100 rounded-xl px-4 py-2 hover:bg-gray-200 transition"
+            className="flex items-center gap-x-3 px-10 mr-3s"
           >
-            <span className="w-1/4 text-left font-medium text-gray-800">{booking.location}</span>
-            <span className="w-1/4 text-left text-gray-700">{booking.seats} seats</span>
-            <span className="w-1/4 text-left text-gray-700">{booking.departureFormattedDate} → In {booking.departure} day(s)</span>
-            <span className="w-1/4 text-right font-semibold text-gray-900">${booking.cost}</span>
+            <span className="w-[20px] truncate text-center font-bold text-gray-800">ID</span>
+            <span className="w-[100px] truncate text-center font-bold text-gray-800">Plane Name</span>
+            <span className="w-[150px] truncate text-center font-bold text-gray-800">Location</span>
+            <Button
+              variant="ghost"
+              className="w-[80px] truncate font-bold text-gray-700"
+              onClick={() => setSortSetting({category: "seats", ascending: sortSetting.category == "seats" && !sortSetting.ascending || false})}
+            >
+              Seats
+              <SortArrow
+                active={sortSetting.category === "seats"}
+                ascending={sortSetting.ascending}
+              />
+            </Button>
+            <Button
+              variant="ghost"
+              className="flex-1 truncate font-bold text-gray-700"
+              onClick={() => setSortSetting({category: "departure", ascending: sortSetting.category == "departure" && !sortSetting.ascending || false})}
+            >
+              Departure
+              <SortArrow
+                active={sortSetting.category === "departure"}
+                ascending={sortSetting.ascending}
+              />
+            </Button>
+            <Button
+              variant="ghost"
+              className="w-[80px] truncate font-bold text-gray-900"
+              onClick={() => setSortSetting({category: "cost", ascending: sortSetting.category == "cost" && !sortSetting.ascending || false})}
+            >
+              Cost
+              <SortArrow
+                active={sortSetting.category === "cost"}
+                ascending={sortSetting.ascending}
+              />
+            </Button>
           </div>
-        ))}
-      </CardContent>
+        </CardContent>
+
+        {
+          /*
+          This is where the flight bars are displayed
+          */
+        }
+        <CardContent className="relative bottom-6 space-y-2 overflow-y-auto py-3">
+          {filteredBookings.map((booking, idx) => (
+            <div
+              key={idx}
+              className="flex items-center gap-x-3 px-10 bg-gray-100 rounded-xl bg-gray bg-white transition py-2 shadow-[0_0px_3px_rgba(0,0,0,0.05)] border border-gray-200"
+            >
+              <span className="w-[20px] truncate text-center font-medium text-gray-800">{booking.flightId}</span>
+              <span className="w-[100px] truncate text-center font-medium text-gray-800">{booking.planeName}</span>
+              <span className="w-[150px] truncate text-center font-medium text-gray-800">{booking.location}</span>
+              <span className="w-[80px] truncate text-center text-gray-700">{booking.seats} seats</span>
+              <span className="flex-1 truncate text-center text-gray-700">{booking.departureFormattedDate} → In {booking.departure} day(s)</span>
+              <span className="w-[80px] truncate text-center font-semibold text-gray-900">${booking.cost}</span>
+            </div>
+          ))}
+        </CardContent>
       </Card>
     </div>
   )
