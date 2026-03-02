@@ -183,7 +183,7 @@ export default function BookingsPage() {
         Sorting available when you click on the "seats", "departure", or "cost" buttons
         */
       }
-      <Card className="absolute top-[2rem] bg-[var(--card)] right-[2rem] w-[calc(65%-3rem)] h-[calc(100%-4rem)]">
+      <Card className="absolute top-[2rem] bg-[var(--card)] right-[2rem] w-[calc(65%-3rem)] h-[calc(100%-4rem)] gap-0 px-2 py-4">
         <CardContent className="relative">
           <CardTitle className="text-lg font-bold">Bookings Overview</CardTitle>
         </CardContent>
@@ -195,14 +195,14 @@ export default function BookingsPage() {
         }
         <CardContent className="relative">
           <div
-            className="flex items-center gap-x-3 px-10 mr-3s"
+            className="flex items-center gap-x-3 px-5"
           >
-            <span className="w-[20px] truncate text-center font-bold text-gray-800">ID</span>
+            <span className="w-[20px] truncate text-left font-bold text-gray-800">ID</span>
             <span className="w-[100px] truncate text-center font-bold text-gray-800">Plane Name</span>
             <span className="w-[150px] truncate text-center font-bold text-gray-800">Destination</span>
             <Button
               variant="ghost"
-              className="w-[80px] truncate font-bold text-gray-700"
+              className="ml-2 w-[80px] truncate font-bold text-gray-700"
               onClick={() => setSortSetting({category: "Seats", ascending: sortSetting.category == "Seats" && !sortSetting.ascending || false})}
             >
               Seats
@@ -224,7 +224,7 @@ export default function BookingsPage() {
             </Button>
             <Button
               variant="ghost"
-              className="w-[80px] truncate font-bold text-gray-900"
+              className="w-[80px] truncate font-bold text-gray-900 text-right"
               onClick={() => setSortSetting({category: "Cost", ascending: sortSetting.category == "Cost" && !sortSetting.ascending || false})}
             >
               Cost
@@ -241,18 +241,18 @@ export default function BookingsPage() {
           This is where the flight bars are displayed
           */
         }
-        <CardContent className="relative bottom-6 space-y-2 overflow-y-auto py-3">
+        <CardContent className="ml-2 mr-2 flex-1 space-y-2 overflow-y-auto py-3 rounded-xl border border-gray-200">
           {filteredBookings.map((booking, idx) => (
             <div
               key={idx}
-              className="flex items-center gap-x-3 px-10 bg-gray-100 hover:bg-gray-100 rounded-xl bg-gray bg-white transition py-2 shadow-[0_0px_3px_rgba(0,0,0,0.05)] border border-gray-200"
+              className="flex items-center gap-x-3 px-4 bg-gray-100 hover:bg-gray-100 rounded-xl bg-gray bg-white transition py-2 shadow-[0_0px_3px_rgba(0,0,0,0.05)] border border-gray-200"
             >
               <span className="w-[20px] truncate text-center font-medium text-gray-800">{booking.flightId}</span>
               <span className="w-[100px] truncate text-center font-medium text-gray-800">{booking.planeName}</span>
               <span className="w-[150px] truncate text-center font-medium text-gray-800">{booking.destination}</span>
               <span className="w-[80px] truncate text-center text-gray-700">{booking.seats} seats</span>
               <span className="flex-1 truncate text-center text-gray-700">{booking.departureFormattedDate} → In {booking.departsIn} day(s)</span>
-              <span className="w-[80px] truncate text-center font-semibold text-gray-900">${booking.cost}</span>
+              <span className="w-[80px] truncate text-center font-semibold text-gray-900">${booking.cost.toFixed(2)}</span>
             </div>
           ))}
         </CardContent>
