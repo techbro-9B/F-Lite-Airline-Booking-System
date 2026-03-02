@@ -18,62 +18,14 @@ up
 
 "use client";
 
-import { createClient } from '@supabase/supabase-js'
+import {getFilteredFlightData} from "@/lib/flightQuery"
 import "@/app/globals.css";
 import {Label} from "@/components/ui/label"
 import { useState, useMemo } from "react";
 import {Input} from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription} from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel} from "@/components/ui/select";
 import * as Slider from "@radix-ui/react-slider";
 import { Button } from "@/components/ui/button";
-
-// loading plane snapshot from supabase
-const supabaseUrl = 'https://mmclsfzzxjemuuacrewm.supabase.co'
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1tY2xzZnp6eGplbXV1YWNyZXdtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0ODUwMjksImV4cCI6MjA4NjA2MTAyOX0.bE6b2XXYlghLYIC4pQxmlGfRC3Q4Lfl93lu2B3ikm7A'
-
-const supabase = createClient(supabaseUrl, supabaseKey)
-
-const { data: flightData, error: flightError } = await supabase
-  .from('flights')
-  .select('*')
-const { data: planesData, error: planesError } = await supabase
-  .from('planes')
-  .select('*')
-
-// creating plane lookup table
-const planeLookup: { [planeId: number]: {name: string, seats: number} } = {}
-console.log(planesData)
-planesData?.forEach((plane) => {
-  planeLookup[plane.plane_id] = {
-    name: plane.plane_name, seats: plane.total_seats
-  }
-})
-
-// creating bookings list
-type Booking = {
-  location: string;
-  seats: number;
-  departure: number;
-  departureFormattedDate: string;
-  planeName: string;
-  cost: number;
-  flightId: number;
-};
-const bookingsList: Booking[] = [];
-flightData?.forEach((flight) => {
-  console.log(flight);
-  const newDate = new Date(flight.departure)
-  bookingsList.push({
-    location: flight.destination,
-    seats: planeLookup[flight.plane_id].seats,
-    departure: Math.ceil((newDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)),
-    departureFormattedDate: `${String(newDate.getMonth() + 1).padStart(2, '0')}/${String(newDate.getDate()).padStart(2, '0')}/${newDate.getFullYear()}`,
-    cost: flight.cost,
-    planeName: planeLookup[flight.plane_id].name,
-    flightId: flight.flight_id,
-  })
-})
 
 // sort arrow function class
 function SortArrow({
@@ -95,53 +47,26 @@ function SortArrow({
 }
 
 export default function BookingsPage() {
-  const [priceFilter, setPriceFilter] = useState<[number, number]>([0, 1500]);
+  const [costFilter, setCostFilter] = useState<[number, number]>([0, 1500]);
   const [departureFilter, setDepartureFilter] = useState<[number, number]>([0, 365]);
-  const [locationFilter, setLocationFilter] = useState<string>("");
+  const [destinationFilter, setDestinationFilter] = useState<string>("");
   const [seatsFilter, setSeatsFilter] = useState<[number, number]>([0, 500]);
 
   // filtering and sorting bookings
-  const [sortSetting, setSortSetting] = useState<{category: "cost" | "departure" | "seats" | null, ascending: boolean | null}>({category: null, ascending: null})
+  const [sortSetting, setSortSetting] = useState<{category: "Cost" | "Departure" | "Seats" | null, ascending: boolean | null}>({category: null, ascending: null})
 
   const filteredBookings = useMemo(() => {
-    // filtering
-    let filtered = bookingsList.filter((b) => {
-      const matchesName =
-        b.location.toLowerCase().includes(locationFilter.toLowerCase());
+    return getFilteredFlightData({
+      destination: destinationFilter,
+      cost: costFilter,
+      departure: departureFilter,
+      seats: seatsFilter,
 
-      const matchesDeparture =
-        b.departure >= departureFilter[0] && b.departure <= departureFilter[1];
-
-      const matchesPrice =
-        b.cost >= priceFilter[0] && b.cost <= priceFilter[1];
-
-      const matchesSeats =
-        b.seats >= seatsFilter[0] && b.seats <= seatsFilter[1];
-
-      return matchesName && matchesDeparture && matchesPrice && matchesSeats;
-    });
-
-    // sorting
-    filtered.sort((a, b) => {
-        const modifier = sortSetting.ascending ? 1 : -1
-
-        if (sortSetting.category === "cost") {
-          return (a.cost - b.cost) * modifier
-        }
-
-        if (sortSetting.category === "departure") {
-          return (a.departure - b.departure) * modifier
-        }
-
-        if (sortSetting.category === "seats") {
-          return (a.seats - b.seats) * modifier
-        }
-
-        return 0
-      })
-
-    return filtered
-  }, [locationFilter, departureFilter, priceFilter, seatsFilter, sortSetting]);
+      entries: null,
+      sortBy: sortSetting.category,
+      sortAscending: sortSetting.ascending,
+    })
+  }, [destinationFilter, departureFilter, costFilter, seatsFilter, sortSetting]);
 
   return (
     <div className = "w-screen h-screen" style={{ background: "var(--background)" }}>
@@ -169,11 +94,11 @@ export default function BookingsPage() {
         </CardHeader>
         <CardContent className="flex flex-col gap-7 list-none overflow-y-auto">
           <li>
-            <Label htmlFor="location">Location</Label>
+            <Label htmlFor="destination">Destination</Label>
             <Input
-              id="location"
+              id="destination"
               className="mt-3"
-              onChange={(e) => setLocationFilter(e.target.value)}
+              onChange={(e) => setDestinationFilter(e.target.value)}
             />
           </li>
 
@@ -182,7 +107,7 @@ export default function BookingsPage() {
             <Slider.Root
               className="relative flex w-full select-none touch-none mt-3 items-center"
               defaultValue={[0, 1500]}
-              onValueChange={(val) => setPriceFilter(val as [number, number])}
+              onValueChange={(val) => setCostFilter(val as [number, number])}
               min={0}
               max={1500}
               step={10}
@@ -196,7 +121,7 @@ export default function BookingsPage() {
             </Slider.Root>
 
             <div className="mt-2 text-gray-700">
-              Selected range: ${priceFilter[0]} – ${priceFilter[1]}
+              Selected range: ${costFilter[0]} – ${costFilter[1]}
             </div>
           </li>
 
@@ -253,7 +178,7 @@ export default function BookingsPage() {
       {
         /*
         The actual flight content
-        Displays flight id, plane name, location, seats remaining, departure date and relative time, and cost
+        Displays flight id, plane name, destination, seats remaining, departure date and relative time, and cost
 
         Sorting available when you click on the "seats", "departure", or "cost" buttons
         */
@@ -274,37 +199,37 @@ export default function BookingsPage() {
           >
             <span className="w-[20px] truncate text-center font-bold text-gray-800">ID</span>
             <span className="w-[100px] truncate text-center font-bold text-gray-800">Plane Name</span>
-            <span className="w-[150px] truncate text-center font-bold text-gray-800">Location</span>
+            <span className="w-[150px] truncate text-center font-bold text-gray-800">Destination</span>
             <Button
               variant="ghost"
               className="w-[80px] truncate font-bold text-gray-700"
-              onClick={() => setSortSetting({category: "seats", ascending: sortSetting.category == "seats" && !sortSetting.ascending || false})}
+              onClick={() => setSortSetting({category: "Seats", ascending: sortSetting.category == "Seats" && !sortSetting.ascending || false})}
             >
               Seats
               <SortArrow
-                active={sortSetting.category === "seats"}
+                active={sortSetting.category === "Seats"}
                 ascending={sortSetting.ascending}
               />
             </Button>
             <Button
               variant="ghost"
               className="flex-1 truncate font-bold text-gray-700"
-              onClick={() => setSortSetting({category: "departure", ascending: sortSetting.category == "departure" && !sortSetting.ascending || false})}
+              onClick={() => setSortSetting({category: "Departure", ascending: sortSetting.category == "Departure" && !sortSetting.ascending || false})}
             >
               Departure
               <SortArrow
-                active={sortSetting.category === "departure"}
+                active={sortSetting.category === "Departure"}
                 ascending={sortSetting.ascending}
               />
             </Button>
             <Button
               variant="ghost"
               className="w-[80px] truncate font-bold text-gray-900"
-              onClick={() => setSortSetting({category: "cost", ascending: sortSetting.category == "cost" && !sortSetting.ascending || false})}
+              onClick={() => setSortSetting({category: "Cost", ascending: sortSetting.category == "Cost" && !sortSetting.ascending || false})}
             >
               Cost
               <SortArrow
-                active={sortSetting.category === "cost"}
+                active={sortSetting.category === "Cost"}
                 ascending={sortSetting.ascending}
               />
             </Button>
@@ -324,9 +249,9 @@ export default function BookingsPage() {
             >
               <span className="w-[20px] truncate text-center font-medium text-gray-800">{booking.flightId}</span>
               <span className="w-[100px] truncate text-center font-medium text-gray-800">{booking.planeName}</span>
-              <span className="w-[150px] truncate text-center font-medium text-gray-800">{booking.location}</span>
+              <span className="w-[150px] truncate text-center font-medium text-gray-800">{booking.destination}</span>
               <span className="w-[80px] truncate text-center text-gray-700">{booking.seats} seats</span>
-              <span className="flex-1 truncate text-center text-gray-700">{booking.departureFormattedDate} → In {booking.departure} day(s)</span>
+              <span className="flex-1 truncate text-center text-gray-700">{booking.departureFormattedDate} → In {booking.departsIn} day(s)</span>
               <span className="w-[80px] truncate text-center font-semibold text-gray-900">${booking.cost}</span>
             </div>
           ))}
