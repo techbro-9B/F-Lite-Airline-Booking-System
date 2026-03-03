@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription} from "@/comp
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel} from "@/components/ui/select";
 import * as Slider from "@radix-ui/react-slider";
 import { Switch } from "@/components/ui/switch";
+import { BookingsNavBar } from "@/components/BookingsNavBar";
 
 type Booking = {
   location: string;
@@ -66,6 +67,8 @@ export default function BookingsPage() {
   }, [nameFilter, departureFilter, priceFilter, seatsFilter]);
 
   return (
+    <>
+    <BookingsNavBar/>
     <div className = "w-screen h-screen" style={{ background: "var(--background)" }}>
       <Label className="text-xl absolute left-[4rem] top-[10rem] font-bold text-[var(--foreground)]">
         Book a Flight
@@ -206,5 +209,6 @@ export default function BookingsPage() {
       </CardContent>
       </Card>
     </div>
+    </>
   )
 }
