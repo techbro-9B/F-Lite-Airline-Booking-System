@@ -1,15 +1,17 @@
-import React from 'react'
+/* 
+The homepage navbar
+Thie navbar need to be fixed for small screens.. some buttons don't show..
+Thats just decoration though, rn need functionality!
 
+Created by Lloyd, Feb 22, 2026
+updated: Lloyd, march 3, 2026 
+*/
 
 import { MaxWidthWrapper } from '@/components/MaxWidthWrapper'
 import Link from 'next/link'
-import { cn } from '@/lib/utils'
 import { buttonVariants } from '@/components/ui/button'
 import { ArrowRight } from 'lucide-react'
 import Image from 'next/image'
-//import {RegisterLink, LoginLink} from "@kinde-oss/kinde-auth-nextjs/components"; <-- from kind
-
-
 
 export const HomeNavBar = () => {
     const customcolour = "1F1F27"
@@ -44,11 +46,11 @@ export const HomeNavBar = () => {
                      className: "mr-4"})}>
                     Book a Flight
                 </Link>
-                <Link className={buttonVariants({variant:'ghost', size:"sm"})} href={"/login"}>
-                    Contact Us
+                <Link className={buttonVariants({variant:'ghost', size:"sm"})} href={"/signup"}>
+                    Signup
                 </Link>
 
-                <Link className={buttonVariants({variant:'outline', size:"sm"})} href={"/signup"}>
+                <Link className={buttonVariants({variant:'outline', size:"sm"})} href={"/login"}>
                     <span className="text-foreground">Login</span> <ArrowRight className='h-5 w-5 text-foreground'/>
                 </Link>
 
