@@ -16,7 +16,7 @@ const { data: planesData, error: planesError } = await supabase
 const { data: destinationsData, error: destinationsError } = await supabase
   .from('destinations')
   .select('*')
-
+  
 // creating plane lookup table
 const planeLookup: { [plane_id: number]: {
     plane_id: number,
@@ -38,7 +38,7 @@ const flightLookup: { [destination_id: number]: {
     cost: number,
 } } = {}
 flightsData?.forEach((flight) => {
-    const departDate = new Date(flight.departure)
+    const departDate = new Date(flight.departure_time)
     const diffInDays = Math.floor(
         (+departDate - +new Date()) / (1000 * 60 * 60 * 24)
     );
@@ -106,6 +106,9 @@ function getFilteredFlightData(flightFilter: flightFilter): flightFilterResult[]
       return destinationStr.toLowerCase().includes(flightFilter.destination!.toLowerCase());
     });
   }
+
+  console.log(filteredFlights)
+
   // filter by cost range [min, max]
   if (flightFilter.cost) {
     const [minCost, maxCost] = flightFilter.cost;
@@ -119,6 +122,7 @@ function getFilteredFlightData(flightFilter: flightFilter): flightFilterResult[]
     const [start, end] = flightFilter.departure;
     filteredFlights = filteredFlights.filter((flight) => {
       const departsIn = flight.departsIn;
+    console.log(start, end, departsIn)
       return departsIn >= start && departsIn <= end;
     });
   }
