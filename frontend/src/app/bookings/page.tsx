@@ -21,9 +21,10 @@ up
 
 import ConfirmationMenu from "./components/ConfirmationMenu";
 import {getFilteredFlightData} from "@/lib/flightQuery"
+import type {flightFilterResult} from "@/lib/flightQuery"
 import "@/app/globals.css";
 import {Label} from "@/components/ui/label"
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {Input} from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription} from "@/components/ui/card";
 import * as Slider from "@radix-ui/react-slider";
@@ -58,17 +59,25 @@ export default function BookingsPage() {
   // filtering and sorting bookings
   const [sortSetting, setSortSetting] = useState<{category: "Cost" | "Departure" | "Seats" | null, ascending: boolean | null}>({category: null, ascending: null})
 
-  const filteredBookings = useMemo(() => {
-    return getFilteredFlightData({
+  const [filteredBookings, setFilteredBookings] = useState<flightFilterResult[]>([]);
+
+  // ✅ Effect to fetch filtered bookings whenever filters change
+  useEffect(() => {
+    let isMounted = true;
+
+    getFilteredFlightData({
       destination: destinationFilter,
       cost: costFilter,
       departure: departureFilter,
       seats: seatsFilter,
-
       entries: null,
       sortBy: sortSetting.category,
       sortAscending: sortSetting.ascending,
-    })
+    }).then((bookings) => {
+      if (isMounted) setFilteredBookings(bookings);
+    });
+
+    return () => { isMounted = false }; // cleanup
   }, [destinationFilter, departureFilter, costFilter, seatsFilter, sortSetting]);
 
   return (

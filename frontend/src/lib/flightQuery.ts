@@ -64,13 +64,13 @@ destinationsData?.forEach((destination: any) => {
 })
 
 // returns a snapshot of the current plane data
-function getPlaneData(plane_id: number) {
+async function getPlaneData(plane_id: number) {
     return structuredClone(planeLookup[plane_id]);
 }
-function getFlightData(flight_id: number) {
+async function getFlightData(flight_id: number) {
     return structuredClone(flightLookup[flight_id]);
 }
-function getDestinationData(destination_id: number) {
+async function getDestinationData(destination_id: number) {
     return structuredClone(destinationLookup[destination_id])
 }
 
@@ -84,7 +84,7 @@ export type flightFilter = {
     sortBy: "Departure" | "Seats" | "Cost" | null,
     sortAscending: boolean | null,
 }
-type flightFilterResult = {
+export type flightFilterResult = {
     destination: string,
     seats: number,
     departsIn: number,
@@ -93,21 +93,37 @@ type flightFilterResult = {
     cost: number,
     flightId: number,
 }
-function getFilteredFlightData(flightFilter: flightFilter): flightFilterResult[] {
+async function getFilteredFlightData(
+  flightFilter: flightFilter
+): Promise<flightFilterResult[]> {
   let filteredFlights = Object.values(flightLookup);
 
-  // filter by destination name
+  // -------------------------
+  // Filter by destination name
+  // -------------------------
   if (flightFilter.destination) {
-    filteredFlights = filteredFlights.filter((flight) => {
-      const destination = getDestinationData(flight.destination_id);
-      const destinationStr = `${destination.city}, ${destination.country}`
-      return destinationStr.toLowerCase().includes(flightFilter.destination!.toLowerCase());
-    });
+    const flightsWithDestinations = await Promise.all(
+      filteredFlights.map(async (flight) => {
+        const destination = await getDestinationData(flight.destination_id);
+        const destinationStr = `${destination.city}, ${destination.country}`;
+        return {
+          flight,
+          matches: destinationStr
+            .toLowerCase()
+            .includes(flightFilter.destination!.toLowerCase()),
+          destinationStr,
+        };
+      })
+    );
+
+    filteredFlights = flightsWithDestinations
+      .filter((item) => item.matches)
+      .map((item) => ({ ...item.flight, destinationStr: item.destinationStr }));
   }
 
-  console.log(filteredFlights)
-
-  // filter by cost range [min, max]
+  // -------------------------
+  // Filter by cost range
+  // -------------------------
   if (flightFilter.cost) {
     const [minCost, maxCost] = flightFilter.cost;
     filteredFlights = filteredFlights.filter(
@@ -115,37 +131,67 @@ function getFilteredFlightData(flightFilter: flightFilter): flightFilterResult[]
     );
   }
 
-  // filter by departure range [start, end] (timestamps)
+  // -------------------------
+  // Filter by departure range
+  // -------------------------
   if (flightFilter.departure) {
     const [start, end] = flightFilter.departure;
-    filteredFlights = filteredFlights.filter((flight) => {
-      const departsIn = flight.departsIn;
-    console.log(start, end, departsIn)
-      return departsIn >= start && departsIn <= end;
-    });
+    filteredFlights = filteredFlights.filter(
+      (flight) => flight.departsIn >= start && flight.departsIn <= end
+    );
   }
 
-  // filter by seats available (total seats - reserved seats)
+  // -------------------------
+  // Filter by seats available
+  // -------------------------
   if (flightFilter.seats) {
     const [minSeats, maxSeats] = flightFilter.seats;
-    filteredFlights = filteredFlights.filter((flight) => {
-      const plane = getPlaneData(flight.plane_id);
-      const availableSeats = plane.total_seats - flight.reserved_seats;
-      return availableSeats >= minSeats && availableSeats <= maxSeats;
-    });
+    const flightsWithSeats = await Promise.all(
+      filteredFlights.map(async (flight) => {
+        const plane = await getPlaneData(flight.plane_id);
+        const availableSeats = plane.total_seats - flight.reserved_seats;
+        return {
+          flight,
+          matches: availableSeats >= minSeats && availableSeats <= maxSeats,
+          availableSeats,
+        };
+      })
+    );
+
+    filteredFlights = flightsWithSeats
+      .filter((item) => item.matches)
+      .map((item) => ({ ...item.flight, availableSeats: item.availableSeats }));
   }
 
-  // sort by the requested field
+  // -------------------------
+  // Sort by requested field
+  // -------------------------
   if (flightFilter.sortBy) {
     const ascending = flightFilter.sortAscending ?? true;
+
+    // Preload planes if sorting by seats
+    let planeCache: Record<string, { total_seats: number }> = {};
+
+    if (flightFilter.sortBy === "Seats") {
+      await Promise.all(
+        filteredFlights.map(async (flight) => {
+          if (!planeCache[flight.plane_id]) {
+            planeCache[flight.plane_id] = await getPlaneData(flight.plane_id);
+          }
+        })
+      );
+    }
+
     filteredFlights.sort((a, b) => {
       let compare = 0;
 
       if (flightFilter.sortBy === "Departure") {
         compare = a.departsIn - b.departsIn;
       } else if (flightFilter.sortBy === "Seats") {
-        const seatsA = getPlaneData(a.plane_id).total_seats - a.reserved_seats;
-        const seatsB = getPlaneData(b.plane_id).total_seats - b.reserved_seats;
+        const seatsA =
+          planeCache[a.plane_id].total_seats - a.reserved_seats;
+        const seatsB =
+          planeCache[b.plane_id].total_seats - b.reserved_seats;
         compare = seatsA - seatsB;
       } else if (flightFilter.sortBy === "Cost") {
         compare = a.cost - b.cost;
@@ -155,25 +201,38 @@ function getFilteredFlightData(flightFilter: flightFilter): flightFilterResult[]
     });
   }
 
-  // limit entries to min and max
+  // -------------------------
+  // Limit entries
+  // -------------------------
   if (flightFilter.entries) {
-    filteredFlights = filteredFlights.slice(flightFilter.entries[0], flightFilter.entries[1]);
+    filteredFlights = filteredFlights.slice(
+      flightFilter.entries[0],
+      flightFilter.entries[1]
+    );
   }
 
-  // map data to bookings
-  const bookings: flightFilterResult[] = filteredFlights.map((flight) => {
-    const plane = getPlaneData(flight.plane_id);
-    const destination = getDestinationData(flight.destination_id);
-    return {
-      destination: `${destination.city}, ${destination.country}`,
-      seats: plane.total_seats - flight.reserved_seats,
-      departsIn: flight.departsIn,
-      departureFormattedDate: flight.departureDate.toLocaleString(),
-      planeName: plane.plane_name,
-      cost: flight.cost,
-      flightId: flight.flight_id,
-    };
-  });
+  // -------------------------
+  // Map data to bookings
+  // -------------------------
+  const bookings: flightFilterResult[] = await Promise.all(
+    filteredFlights.map(async (flight) => {
+      const plane = await getPlaneData(flight.plane_id);
+      const destination = await getDestinationData(flight.destination_id);
+      const destinationStr = `${destination.city}, ${destination.country}`
+      const availableSeats = plane.total_seats - flight.reserved_seats;
+
+      return {
+        destination: destinationStr,
+        seats: availableSeats,
+        departsIn: flight.departsIn,
+        departureFormattedDate: flight.departureDate.toLocaleString(),
+        planeName: plane.plane_name,
+        cost: flight.cost,
+        flightId: flight.flight_id,
+      };
+    })
+  );
+
   return bookings;
 }
 
