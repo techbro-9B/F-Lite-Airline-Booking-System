@@ -1,19 +1,20 @@
-
+"use server"
 import { createClient } from '@supabase/supabase-js'
 
+
+import { supabaseClientSide } from './supabase/client'
 // loading plane snapshot from supabase
-const supabaseUrl = 'https://mmclsfzzxjemuuacrewm.supabase.co'
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1tY2xzZnp6eGplbXV1YWNyZXdtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0ODUwMjksImV4cCI6MjA4NjA2MTAyOX0.bE6b2XXYlghLYIC4pQxmlGfRC3Q4Lfl93lu2B3ikm7A'
 
-const supabase = createClient(supabaseUrl, supabaseKey)
 
-const { data: flightsData, error: flightsError } = await supabase
+
+
+const { data: flightsData, error: flightsError } = await supabaseClientSide
   .from('flights')
   .select('*')
-const { data: planesData, error: planesError } = await supabase
+const { data: planesData, error: planesError } = await supabaseClientSide
   .from('planes')
   .select('*')
-const { data: destinationsData, error: destinationsError } = await supabase
+const { data: destinationsData, error: destinationsError } = await supabaseClientSide
   .from('destinations')
   .select('*')
   
