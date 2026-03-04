@@ -1,3 +1,4 @@
+"use client";
 /*
 
 READ ME README
@@ -16,7 +17,7 @@ up
 */
 
 
-"use client";
+
 
 import ConfirmationMenu from "./components/ConfirmationMenu";
 import {getFilteredFlightData} from "@/lib/flightQuery"
