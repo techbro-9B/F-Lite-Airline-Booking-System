@@ -5,9 +5,6 @@ import { createClient } from '@supabase/supabase-js'
 import { supabaseClientSide } from './supabase/client'
 // loading plane snapshot from supabase
 
-
-
-
 const { data: flightsData, error: flightsError } = await supabaseClientSide
   .from('flights')
   .select('*')
@@ -24,7 +21,7 @@ const planeLookup: { [plane_id: number]: {
     plane_name: string,
     total_seats: number
 } } = {}
-planesData?.forEach((plane) => {
+planesData?.forEach((plane: any) => {
   planeLookup[plane.plane_id] = plane
 })
 
@@ -38,7 +35,7 @@ const flightLookup: { [destination_id: number]: {
     departsIn: number,  // number of days before departure
     cost: number,
 } } = {}
-flightsData?.forEach((flight) => {
+flightsData?.forEach((flight: any) => {
     const departDate = new Date(flight.departure_time)
     const diffInDays = Math.floor(
         (+departDate - +new Date()) / (1000 * 60 * 60 * 24)
@@ -62,7 +59,7 @@ const destinationLookup: { [destination_id: number]: {
     city: string,
     airport_code: string,
 } } = {}
-destinationsData?.forEach((destination) => {
+destinationsData?.forEach((destination: any) => {
   destinationLookup[destination.destination_id] = destination
 })
 
