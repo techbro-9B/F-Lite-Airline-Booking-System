@@ -1,8 +1,27 @@
+"use client";
+
 import "@/app/globals.css";
 import React from "react";
 import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-export default function ConfirmationMenu() {
+import { Button } from "@/components/ui/button";    
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+
+type ConfirmationMenuProps = {
+  open: boolean;
+  close: () => void;
+  confirmationData: confirmationData;
+};
+type confirmationData = {
+    destination: string,
+    departure: string,
+    seats: number,
+  }
+
+export default function ConfirmationMenu({
+    open, close, confirmationData
+}: ConfirmationMenuProps) {
+    if (!open) return null;
     return (
         <div style={{position: "fixed", zIndex: 1000}}>
             <div style={{height: '100vh', width: '100vw', backgroundColor: "rgba(0,0,0,0)", backdropFilter: "blur(6px)"}}/>
@@ -18,11 +37,11 @@ export default function ConfirmationMenu() {
             }}>
                 <CardTitle style={{fontWeight: "bold", fontSize: 35}}>Confirm Order</CardTitle>
                 <CardContent>
-                    <div>Destination</div>
+                    <div>Destination: {confirmationData.destination}</div>
                     
-                    <div>Departure</div>
+                    <div>Departure: {confirmationData.departure}</div>
 
-                    <div>Seats</div>
+                    <div>Seats: {confirmationData.seats}</div>
                     
                     {/* Actions */}
                     <Button style={{
@@ -30,14 +49,19 @@ export default function ConfirmationMenu() {
                         right: 10,
                         bottom: 10,
                         width: 100,
-                    }}>Next</Button>
-                    <Button style={{
-                        position: "fixed",
-                        right: 120,
-                        bottom: 10,
-                        width: 100,
-                        background: 'var(--destructive)',
-                    }}>Cancel</Button>
+                    }}><Link href="/bookings/seatselection">Next</Link></Button>
+                    <Button
+                        style={{
+                            position: "fixed",
+                            right: 120,
+                            bottom: 10,
+                            width: 100,
+                            background: "var(--destructive)",
+                        }}
+                        onClick={close}
+                    >
+                        Cancel
+                    </Button>
 
                     {/* Logo */}
                     <svg

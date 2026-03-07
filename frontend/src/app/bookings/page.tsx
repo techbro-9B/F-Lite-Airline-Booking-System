@@ -16,9 +16,6 @@ up
 
 */
 
-
-
-
 import ConfirmationMenu from "./components/ConfirmationMenu";
 import {getFilteredFlightData} from "@/lib/flightQuery"
 import type {flightFilterResult} from "@/lib/flightQuery"
@@ -80,13 +77,28 @@ export default function BookingsPage() {
     return () => { isMounted = false }; // cleanup
   }, [destinationFilter, departureFilter, costFilter, seatsFilter, sortSetting]);
 
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmationData, setConfirmationData] = useState<{
+    destination: string,
+    departure: string,
+    seats: number,
+  }>({
+    destination: "",
+    departure: "",
+    seats: 0,
+  });
+
   return (
     <div style={{overflow:"hidden", height: "100vh", width: "100vw"}}>
       <HomeNavBar/>
       <div className = "w-screen h-screen" style={{flex: 1, position: "absolute", overflow: "hidden", background: "var(--background)" }}>
-        
 
         {/* <ConfirmationMenu/> */}
+        <ConfirmationMenu
+          open={confirmOpen}
+          close={() => setConfirmOpen(false)}
+          confirmationData={confirmationData}
+        />
 
         <Label className="text-xl absolute left-[4rem] top-[10rem] font-bold text-[var(--foreground)]">
           Book a Flight
@@ -262,6 +274,14 @@ export default function BookingsPage() {
               <div
                 key={idx}
                 className="flex items-center gap-x-3 px-4 bg-gray-100 hover:bg-gray-100 rounded-xl bg-gray bg-white transition py-2 shadow-[0_0px_3px_rgba(0,0,0,0.05)] border border-gray-200"
+                onMouseDown={() => {
+                  setConfirmOpen(true);
+                  setConfirmationData({
+                    destination: booking.destination,
+                    seats: booking.seats,
+                    departure: booking.departureFormattedDate + " → In " + booking.departsIn + " day(s)",
+                  })
+                }}
               >
                 <span className="w-[20px] truncate text-center font-medium text-gray-800">{booking.flightId}</span>
                 <span className="w-[100px] truncate text-center font-medium text-gray-800">{booking.planeName}</span>
