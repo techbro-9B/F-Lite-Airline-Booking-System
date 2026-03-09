@@ -1,3 +1,4 @@
+"use client"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -15,7 +16,10 @@ import {
   FieldSeparator,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-
+import { redirect, useRouter } from "next/navigation"
+import { useState } from "react"
+import { supabaseClientSide } from "@/lib/supabase/client"
+import Link from "next/link"
 
 /* 
 the login form 
@@ -27,6 +31,49 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  console.log("Login form Rendered!")
+  const router = useRouter()
+
+  // creating states/ variables that'll change
+  const [userpassword, setUserPassword] = useState("")
+  const [useremail, setUserEmail] = useState("")
+  const [loading, setLoading] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);  
+  
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setErrorMessage(null)
+    setLoading(true)
+
+    try {
+      const { data, error } = await supabaseClientSide.auth.signInWithPassword({
+        email: useremail,
+        password: userpassword,
+      })
+
+      console.log("signIn result:", { data, error })
+
+      if (error) {
+        setErrorMessage(error.message || "Login failed")
+        console.log("Supabase error:", error)
+        return
+      }
+
+      if (!data.user) {
+        setErrorMessage("No user returned from Supabase")
+        return
+      }
+
+      console.log("Login successful:", data.user)
+      router.push("/account")
+    } catch (err: any) {
+      console.error("Unexpected login error:", err)
+      setErrorMessage("Unexpected error. Please try again.")
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
@@ -37,7 +84,7 @@ export function LoginForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form>
+          <form onSubmit={(e)=>handleSubmit(e)}>
             <FieldGroup>
               <Field>
                 <Button variant="outline" type="button">
@@ -67,7 +114,8 @@ export function LoginForm({
                 <Input
                   id="email"
                   type="email"
-                  placeholder="m@example.com"
+                  placeholder="jepemstein@example.com"
+                  onChange={(e)=>{setUserEmail(e.target.value)}}
                   required
                 />
               </Field>
@@ -81,14 +129,21 @@ export function LoginForm({
                     Forgot your password?
                   </a>
                 </div>
-                <Input id="password" type="password" required />
+                <Input id="password" type="password" onChange={(e)=>{setUserPassword(e.target.value)}} required />
               </Field>
               <Field>
                 <Button type="submit">Login</Button>
                 <FieldDescription className="text-center">
-                  Don&apos;t have an account? <a href="#">Sign up</a>
+                  Don&apos;t have an account? <Link href="/signup">Sign up</Link>
                 </FieldDescription>
               </Field>
+              {errorMessage && (
+                  <Field>
+                    <FieldDescription className="text-destructive">
+                      {errorMessage}
+                    </FieldDescription>
+                  </Field>
+                )}
             </FieldGroup>
           </form>
         </CardContent>

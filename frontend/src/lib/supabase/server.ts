@@ -38,4 +38,4 @@ export async function createClient() {
   );
 }
 
-export const suapbaseServerSide = createClient() // rememeber, cookies writing is handled in proxy.ts
+export const suapbaseServerSide = await createClient() // rememeber, cookies writing is handled in proxy.ts

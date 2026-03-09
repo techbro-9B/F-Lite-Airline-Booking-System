@@ -33,7 +33,7 @@ export function SignupForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-
+  console.log("Signup Form Rendered!")
   const router = useRouter()
 
   // creating states/ variables that'll change
