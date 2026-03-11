@@ -1,6 +1,6 @@
 /* 
-The homepage navbar
-Thie navbar need to be fixed for small screens.. some buttons don't show..
+The Nav bar for the rest of the application
+Thie navbar need to be fixed for small screens.. some buttons don't show..<--- fix the HomeNavbar as well
 Thats just decoration though, rn need functionality!
 
 Created by Lloyd, Feb 22, 2026
@@ -13,8 +13,8 @@ import { buttonVariants } from '@/components/ui/button'
 import { ArrowRight } from 'lucide-react'
 import Image from 'next/image'
 
-export const HomeNavBar = () => {
-    const customcolour = "1F1F27"
+export const BookingsNavBar = () => {
+    
     return (
     <>
     
@@ -40,18 +40,12 @@ export const HomeNavBar = () => {
             <div className='hidden items-center space-x-4 sm:flex text-background'>
                 <>
                 {/**Using a fragement so that the DOM isn't extended. */}
-                <Link href = {"/bookings"} className={buttonVariants({
-                    variant:'ghost',
-                     size:"sm", 
-                     className: "mr-4"})}>
-                    Book a Flight
-                </Link>
-                <Link className={buttonVariants({variant:'ghost', size:"sm"})} href={"/signup"}>
-                    Signup
+                <Link className={buttonVariants({variant:'ghost', size:"sm"})} href={"/bookings"}>
+                    View Flights
                 </Link>
 
                 <Link className={buttonVariants({variant:'outline', size:"sm"})} href={"/account"}>
-                    <span className="text-foreground">Login</span> <ArrowRight className='h-5 w-5 text-foreground'/>
+                    <span className="text-foreground">My Account</span> 
                 </Link>
 
         
@@ -69,4 +63,3 @@ export const HomeNavBar = () => {
     </>
   )
 }
-
