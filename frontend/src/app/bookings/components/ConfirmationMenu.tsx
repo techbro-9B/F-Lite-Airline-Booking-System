@@ -1,10 +1,8 @@
 "use client";
 
 import "@/app/globals.css";
-import React from "react";
-import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";    
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 type ConfirmationMenuProps = {

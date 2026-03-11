@@ -10,10 +10,10 @@ YES I WILL ADD COMMENTS
 
 BUT NOT NOWWWWWWWWWWWWWWWW
 
-
 let's get it to work and look a little decent first, then iterate through the code and clean it
 up
 
+lol.... <-- lloyd
 */
 
 import ConfirmationMenu from "./components/ConfirmationMenu";
@@ -21,9 +21,9 @@ import {getFilteredFlightData} from "@/lib/flightQuery"
 import type {flightFilterResult} from "@/lib/flightQuery"
 import "@/app/globals.css";
 import {Label} from "@/components/ui/label"
-import { useState, useMemo, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {Input} from "@/components/ui/input"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import * as Slider from "@radix-ui/react-slider";
 import { Button } from "@/components/ui/button";
 import { HomeNavBar } from "../homepage/components/HomeNavBar";
@@ -89,6 +89,7 @@ export default function BookingsPage() {
   });
 
   return (
+ 
     <div style={{overflow:"hidden", height: "100vh", width: "100vw"}}>
       <HomeNavBar/>
       <div className = "w-screen h-screen" style={{flex: 1, position: "absolute", overflow: "hidden", background: "var(--background)" }}>
@@ -295,6 +296,7 @@ export default function BookingsPage() {
         </Card>
       </div>
     </div>
-    </>
+    
+  
   )
 }

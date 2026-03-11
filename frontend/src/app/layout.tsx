@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "F-lite",
-  description: "F-lite is the aviation company of the next generation!",
+  description: "F-lite is the aviation company of the future!",
 };
 
 export default function RootLayout({
