@@ -37,5 +37,3 @@ export async function createClient() {
     }
   );
 }
-
-export const suapbaseServerSide = await createClient() // rememeber, cookies writing is handled in proxy.ts

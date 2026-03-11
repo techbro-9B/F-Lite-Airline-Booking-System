@@ -1,213 +1,299 @@
 "use client";
+/*
 
+READ ME README
+
+
+YES THE CODE IS MESSY
+
+YES I WILL ADD COMMENTS
+
+BUT NOT NOWWWWWWWWWWWWWWWW
+
+
+let's get it to work and look a little decent first, then iterate through the code and clean it
+up
+
+*/
+
+import ConfirmationMenu from "./components/ConfirmationMenu";
+import {getFilteredFlightData} from "@/lib/flightQuery"
+import type {flightFilterResult} from "@/lib/flightQuery"
 import "@/app/globals.css";
 import {Label} from "@/components/ui/label"
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {Input} from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription} from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel} from "@/components/ui/select";
 import * as Slider from "@radix-ui/react-slider";
-import { Switch } from "@/components/ui/switch";
-import { BookingsNavBar } from "@/components/BookingsNavBar";
+import { Button } from "@/components/ui/button";
+import { HomeNavBar } from "../homepage/components/HomeNavBar";
 
-type Booking = {
-  location: string;
-  seats: number;
-  departure: number;
-  cost: number;
-};
-
-const bookingsList: Booking[] = [
-  { location: "New York", seats: 120, departure: 3, cost: 450 },
-  { location: "Los Angeles", seats: 85, departure: 2, cost: 380},
-  { location: "Chicago", seats: 60, departure: 1, cost: 900 },
-  { location: "Nevada", seats: 60, departure: 1, cost: 900 },
-  { location: "Narnia", seats: 60, departure: 5, cost: 900 },
-  { location: "School", seats: 60, departure: 5, cost: 900 },
-  { location: "Yepsteen Island", seats: 60, departure: 16, cost: 900 },
-  { location: "CCP County", seats: 60, departure: 16, cost: 900 },
-  { location: "St Barts Island", seats: 120, departure: 3, cost: 450 },
-  { location: "St Thomas", seats: 200, departure: 3, cost: 450 },
-  { location: "Toronto", seats: 300, departure: 3, cost: 450 },
-  { location: "Kampala", seats: 400, departure: 3, cost: 450 },
-  { location: "Shanghai", seats: 0, departure: 3, cost: 450 },
-  { location: "Bhatum", seats: 0, departure: 3, cost: 450 },
-  { location: "New Delhi", seats: 0, departure: 3, cost: 450 },
-  { location: "Tokyo", seats: 0, departure: 16, cost: 900 },
-  { location: "The Sun", seats: 0, departure: 16, cost: 1434 },
-  { location: "188 Pearson Lane", seats: 60, departure: 16, cost: 900 },
-  { location: "1881 Pearson Lane", seats: 60, departure: 16, cost: 900 },
-  { location: "18811 Pearson Lane", seats: 60, departure: 6, cost: 900 },
-  { location: "188111 Pearson Lane", seats: 0, departure: 2, cost: 1500 },
-  { location: "Suspicious Island With Apparently No Files", seats: 0, departure: 2, cost: 3 },
-];
-
-export default function BookingsPage() {
-  const [priceFilter, setPriceFilter] = useState<[number, number]>([0, 1500]);
-  const [departureFilter, setDepartureFilter] = useState<[number, number]>([0, 90]);
-  const [nameFilter, setNameFilter] = useState<string>("");
-  const [seatsFilter, setSeatsFilter] = useState<[number, number]>([0, 500]);
-
-  const filteredBookings = useMemo(() => {
-    return bookingsList.filter((b) => {
-      const matchesName =
-        b.location.toLowerCase().includes(nameFilter.toLowerCase());
-
-      const matchesDeparture =
-        b.departure >= departureFilter[0] && b.departure <= departureFilter[1];
-
-      const matchesPrice =
-        b.cost >= priceFilter[0] && b.cost <= priceFilter[1];
-
-      const matchesSeats =
-        b.seats >= seatsFilter[0] && b.seats <= seatsFilter[1];
-
-      return matchesName && matchesDeparture && matchesPrice && matchesSeats;
-    });
-  }, [nameFilter, departureFilter, priceFilter, seatsFilter]);
+// sort arrow function class
+function SortArrow({
+  active,
+  ascending,
+}: {
+  active: boolean
+  ascending: boolean | null
+}) {
+  if (!active) {
+    return <span className="opacity-30">↕</span>
+  }
 
   return (
-    <>
-    <BookingsNavBar/>
-    <div className = "w-screen h-screen" style={{ background: "var(--background)" }}>
-      <Label className="text-xl absolute left-[4rem] top-[10rem] font-bold text-[var(--foreground)]">
-        Book a Flight
-      </Label>
-      <Label className="text-m absolute left-[4rem] top-[calc(12rem)] w-[calc(35%-6rem)] text-[var(--foreground)]">
-        To book a flight, use the filters and choose your desired flight on the card on the right.
-      </Label>
-      <Card className="absolute bottom-[2rem] bg-[var(--card)] left-[2rem] w-[calc(35%-3rem)] h-[calc(70%-4rem)] shadow-[0_10px_25px_rgba(0,0,0,0.3)]">
-        <CardHeader>
-          <CardTitle>Filters</CardTitle>
-        </CardHeader>
+    <span className="ml">
+      {ascending ? "↑" : "↓"}
+    </span>
+  )
+}
 
-        <CardContent className="flex flex-col gap-7 list-none overflow-y-auto">
-          <li>
-            <Label htmlFor="name">Name</Label>
-            <Input
-              id="name"
-              placeholder="Enter name"
-              className="mt-3"
-              onChange={(e) => setNameFilter(e.target.value)}
-            />
-          </li>
+export default function BookingsPage() {
+  const [costFilter, setCostFilter] = useState<[number, number]>([0, 1500]);
+  const [departureFilter, setDepartureFilter] = useState<[number, number]>([0, 365]);
+  const [destinationFilter, setDestinationFilter] = useState<string>("");
+  const [seatsFilter, setSeatsFilter] = useState<[number, number]>([0, 500]);
 
-          <li>
-            <Label htmlFor="price">Price</Label>
-            <Slider.Root
-              className="relative flex w-full select-none touch-none mt-3 items-center"
-              defaultValue={[0, 1500]}
-              onValueChange={(val) => setPriceFilter(val as [number, number])}
-              min={0}
-              max={1500}
-              step={10}
+  // filtering and sorting bookings
+  const [sortSetting, setSortSetting] = useState<{category: "Cost" | "Departure" | "Seats" | null, ascending: boolean | null}>({category: null, ascending: null})
+
+  const [filteredBookings, setFilteredBookings] = useState<flightFilterResult[]>([]);
+
+  // ✅ Effect to fetch filtered bookings whenever filters change
+  useEffect(() => {
+    let isMounted = true;
+
+    getFilteredFlightData({
+      destination: destinationFilter,
+      cost: costFilter,
+      departure: departureFilter,
+      seats: seatsFilter,
+      entries: null,
+      sortBy: sortSetting.category,
+      sortAscending: sortSetting.ascending,
+    }).then((bookings) => {
+      if (isMounted) setFilteredBookings(bookings);
+    });
+
+    return () => { isMounted = false }; // cleanup
+  }, [destinationFilter, departureFilter, costFilter, seatsFilter, sortSetting]);
+
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmationData, setConfirmationData] = useState<{
+    destination: string,
+    departure: string,
+    seats: number,
+  }>({
+    destination: "",
+    departure: "",
+    seats: 0,
+  });
+
+  return (
+    <div style={{overflow:"hidden", height: "100vh", width: "100vw"}}>
+      <HomeNavBar/>
+      <div className = "w-screen h-screen" style={{flex: 1, position: "absolute", overflow: "hidden", background: "var(--background)" }}>
+
+        {/* <ConfirmationMenu/> */}
+        <ConfirmationMenu
+          open={confirmOpen}
+          close={() => setConfirmOpen(false)}
+          confirmationData={confirmationData}
+        />
+
+        <Label className="text-xl absolute left-[4rem] top-[10rem] font-bold text-[var(--foreground)]">
+          Book a Flight
+        </Label>
+        <Label className="text-m absolute left-[4rem] top-[calc(12rem)] w-[calc(35%-6rem)] text-[var(--foreground)]">
+          To book a flight, use the filters and choose your desired flight on the card on the right.
+        </Label>
+
+        {
+          /*
+          Filters
+          Controls what elements get shown
+          Current filters: name, cost, maximum departure, seats remaining
+
+          Next: filter by which day to depart
+          */
+        }
+        <Card className="absolute bottom-[2rem] bg-[var(--card)] left-[2rem] w-[calc(35%-3rem)] h-[calc(70%-4rem)]">
+          <CardHeader>
+            <CardTitle>Filters</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-7 list-none overflow-y-auto">
+            <li>
+              <Label htmlFor="destination">Destination</Label>
+              <Input
+                id="destination"
+                className="mt-3"
+                onChange={(e) => setDestinationFilter(e.target.value)}
+              />
+            </li>
+
+            <li>
+              <Label htmlFor="price">Price</Label>
+              <Slider.Root
+                className="relative flex w-full select-none touch-none mt-3 items-center"
+                defaultValue={[0, 1500]}
+                onValueChange={(val) => setCostFilter(val as [number, number])}
+                min={0}
+                max={1500}
+                step={10}
+              >
+                <Slider.Track className="bg-gray-300 relative flex-1 h-2 rounded-full">
+                  <Slider.Range className="absolute bg-blue-500 h-full rounded-full" />
+                </Slider.Track>
+
+                <Slider.Thumb className="block w-5 h-5 bg-white border border-gray-400 rounded-full shadow-md" />
+                <Slider.Thumb className="block w-5 h-5 bg-white border border-gray-400 rounded-full shadow-md" />
+              </Slider.Root>
+
+              <div className="mt-2 text-gray-700">
+                Selected range: ${costFilter[0]} – ${costFilter[1]}
+              </div>
+            </li>
+
+            <li>
+              <Label htmlFor="departure">Departure</Label>
+              <Slider.Root
+                className="relative flex w-full select-none touch-none mt-3 items-center"
+                defaultValue={[0, 365]}
+                onValueChange={(val) => setDepartureFilter(val as [number, number])}
+                min={0}
+                max={365}
+                step={1}
+              >
+                <Slider.Track className="bg-gray-300 relative flex-1 h-2 rounded-full">
+                  <Slider.Range className="absolute bg-blue-500 h-full rounded-full" />
+                </Slider.Track>
+
+                <Slider.Thumb className="block w-5 h-5 bg-white border border-gray-400 rounded-full shadow-md" />
+                <Slider.Thumb className="block w-5 h-5 bg-white border border-gray-400 rounded-full shadow-md" />
+              </Slider.Root>
+
+              <div className="mt-2 text-gray-700">
+                In {departureFilter[0]} to {departureFilter[1]} days
+              </div>
+            </li>
+
+            <li>
+              <Label htmlFor="seats">Seats</Label>
+              <Slider.Root
+                className="relative flex w-full select-none touch-none mt-3 items-center"
+                defaultValue={[0, 500]}
+                onValueChange={(val) => setSeatsFilter(val as [number, number])}
+                min={0}
+                max={500}
+                step={1}
+              >
+                <Slider.Track className="bg-gray-300 relative flex-1 h-2 rounded-full">
+                  <Slider.Range className="absolute bg-blue-500 h-full rounded-full" />
+                </Slider.Track>
+
+                <Slider.Thumb className="block w-5 h-5 bg-white border border-gray-400 rounded-full shadow-md" />
+                <Slider.Thumb className="block w-5 h-5 bg-white border border-gray-400 rounded-full shadow-md" />
+              </Slider.Root>
+
+              <div className="mt-2 text-gray-700">
+                Has {seatsFilter[0]} to {seatsFilter[1]} seats
+              </div>
+            </li>
+          </CardContent>
+        </Card>
+
+
+
+        {
+          /*
+          The actual flight content
+          Displays flight id, plane name, destination, seats remaining, departure date and relative time, and cost
+
+          Sorting available when you click on the "seats", "departure", or "cost" buttons
+          */
+        }
+        <Card className="absolute top-[2rem] bg-[var(--card)] right-[2rem] w-[calc(65%-3rem)] h-[calc(100%-4rem)] gap-0 px-2 py-4">
+          <CardContent className="relative">
+            <CardTitle className="text-lg font-bold">Bookings Overview</CardTitle>
+          </CardContent>
+
+          {
+            /*
+            This is where the titles are displayed
+            */
+          }
+          <CardContent className="relative">
+            <div
+              className="flex items-center gap-x-3 px-5"
             >
-              <Slider.Track className="bg-gray-300 relative flex-1 h-2 rounded-full">
-                <Slider.Range className="absolute bg-blue-500 h-full rounded-full" />
-              </Slider.Track>
-
-              <Slider.Thumb className="block w-5 h-5 bg-white border border-gray-400 rounded-full shadow-md" />
-              <Slider.Thumb className="block w-5 h-5 bg-white border border-gray-400 rounded-full shadow-md" />
-            </Slider.Root>
-
-            <div className="mt-2 text-gray-700">
-              Selected range: ${priceFilter[0]} – ${priceFilter[1]}
+              <span className="w-[20px] truncate text-left font-bold text-gray-800">ID</span>
+              <span className="w-[100px] truncate text-center font-bold text-gray-800">Plane Name</span>
+              <span className="w-[150px] truncate text-center font-bold text-gray-800">Destination</span>
+              <Button
+                variant="ghost"
+                className="ml-2 w-[80px] truncate font-bold text-gray-700"
+                onClick={() => setSortSetting({category: "Seats", ascending: sortSetting.category == "Seats" && !sortSetting.ascending || false})}
+              >
+                Seats
+                <SortArrow
+                  active={sortSetting.category === "Seats"}
+                  ascending={sortSetting.ascending}
+                />
+              </Button>
+              <Button
+                variant="ghost"
+                className="flex-1 truncate font-bold text-gray-700"
+                onClick={() => setSortSetting({category: "Departure", ascending: sortSetting.category == "Departure" && !sortSetting.ascending || false})}
+              >
+                Departure
+                <SortArrow
+                  active={sortSetting.category === "Departure"}
+                  ascending={sortSetting.ascending}
+                />
+              </Button>
+              <Button
+                variant="ghost"
+                className="w-[80px] truncate font-bold text-gray-900 text-right"
+                onClick={() => setSortSetting({category: "Cost", ascending: sortSetting.category == "Cost" && !sortSetting.ascending || false})}
+              >
+                Cost
+                <SortArrow
+                  active={sortSetting.category === "Cost"}
+                  ascending={sortSetting.ascending}
+                />
+              </Button>
             </div>
-          </li>
+          </CardContent>
 
-          <li>
-            <Label htmlFor="departure">Departure</Label>
-            <Slider.Root
-              className="relative flex w-full select-none touch-none mt-3 items-center"
-              defaultValue={[0, 90]}
-              onValueChange={(val) => setDepartureFilter(val as [number, number])}
-              min={0}
-              max={90}
-              step={1}
-            >
-              <Slider.Track className="bg-gray-300 relative flex-1 h-2 rounded-full">
-                <Slider.Range className="absolute bg-blue-500 h-full rounded-full" />
-              </Slider.Track>
-
-              <Slider.Thumb className="block w-5 h-5 bg-white border border-gray-400 rounded-full shadow-md" />
-              <Slider.Thumb className="block w-5 h-5 bg-white border border-gray-400 rounded-full shadow-md" />
-            </Slider.Root>
-
-            <div className="mt-2 text-gray-700">
-              In {departureFilter[0]} to {departureFilter[1]} days
-            </div>
-          </li>
-
-          <li>
-            <Label htmlFor="seats">Seats</Label>
-            <Slider.Root
-              className="relative flex w-full select-none touch-none mt-3 items-center"
-              defaultValue={[0, 500]}
-              onValueChange={(val) => setSeatsFilter(val as [number, number])}
-              min={0}
-              max={500}
-              step={1}
-            >
-              <Slider.Track className="bg-gray-300 relative flex-1 h-2 rounded-full">
-                <Slider.Range className="absolute bg-blue-500 h-full rounded-full" />
-              </Slider.Track>
-
-              <Slider.Thumb className="block w-5 h-5 bg-white border border-gray-400 rounded-full shadow-md" />
-              <Slider.Thumb className="block w-5 h-5 bg-white border border-gray-400 rounded-full shadow-md" />
-            </Slider.Root>
-
-            <div className="mt-2 text-gray-700">
-              Has {seatsFilter[0]} to {seatsFilter[1]} seats
-            </div>
-          </li>
-
-          <li>
-            <Label htmlFor="category">Category [In Progress]</Label>
-            <Select>
-              <SelectTrigger className="w-full mt-2">
-                <SelectValue placeholder="Select a thing"/>
-              </SelectTrigger>
-              <SelectContent className="bg-white">
-                <SelectGroup>
-                  <SelectLabel>Stuff</SelectLabel>
-                    <SelectItem value="apple">Apple</SelectItem>
-                    <SelectItem value="banana">Banana</SelectItem>
-                    <SelectItem value="blueberry">Blueberry</SelectItem>
-                    <SelectItem value="grapes">Grapes</SelectItem>
-                    <SelectItem value="pineapple">Pineapple</SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </li>
-        </CardContent>
-      </Card>
-      <Card className="absolute top-[2rem] bg-[var(--card)] right-[2rem] w-[calc(65%-3rem)] h-[calc(100%-4rem)] shadow-[0_10px_25px_rgba(0,0,0,0.3)]">
-        <CardHeader>
-        <CardTitle className="text-lg font-semibold">Bookings Overview</CardTitle>
-      </CardHeader>
-
-      <div
-        className="ml-3 mr-3 flex justify-between items-center px-4 py-2s"
-      >
-        <span className="w-1/4 text-left font-bold text-gray-800">Location</span>
-        <span className="w-1/4 text-left font-bold font-boldtext-gray-700">seats</span>
-        <span className="w-1/4 text-left font-bold text-gray-700">Departure</span>
-        <span className="w-1/4 text-right font-bold text-gray-900">Cost</span>
+          {
+            /*
+            This is where the flight bars are displayed
+            */
+          }
+          <CardContent className="ml-2 mr-2 flex-1 space-y-2 overflow-y-auto py-3 rounded-xl border border-gray-200">
+            {filteredBookings.map((booking, idx) => (
+              <div
+                key={idx}
+                className="flex items-center gap-x-3 px-4 bg-gray-100 hover:bg-gray-100 rounded-xl bg-gray bg-white transition py-2 shadow-[0_0px_3px_rgba(0,0,0,0.05)] border border-gray-200"
+                onMouseDown={() => {
+                  setConfirmOpen(true);
+                  setConfirmationData({
+                    destination: booking.destination,
+                    seats: booking.seats,
+                    departure: booking.departureFormattedDate + " → In " + booking.departsIn + " day(s)",
+                  })
+                }}
+              >
+                <span className="w-[20px] truncate text-center font-medium text-gray-800">{booking.flightId}</span>
+                <span className="w-[100px] truncate text-center font-medium text-gray-800">{booking.planeName}</span>
+                <span className="w-[150px] truncate text-center font-medium text-gray-800">{booking.destination}</span>
+                <span className="w-[80px] truncate text-center text-gray-700">{booking.seats} seats</span>
+                <span className="flex-1 truncate text-center text-gray-700">{booking.departureFormattedDate} → In {booking.departsIn} day(s)</span>
+                <span className="w-[80px] truncate text-center font-semibold text-gray-900">${booking.cost.toFixed(2)}</span>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
       </div>
-      <CardContent className="space-y-3 overflow-y-auto">
-        {filteredBookings.map((booking, idx) => (
-          <div
-            key={idx}
-            className="flex justify-between items-center bg-gray-100 rounded-xl px-4 py-2 hover:bg-gray-200 transition"
-          >
-            <span className="w-1/4 text-left font-medium text-gray-800">{booking.location}</span>
-            <span className="w-1/4 text-left text-gray-700">{booking.seats} seats</span>
-            <span className="w-1/4 text-left text-gray-700">In {booking.departure} day(s)</span>
-            <span className="w-1/4 text-right font-semibold text-gray-900">${booking.cost}</span>
-          </div>
-        ))}
-      </CardContent>
-      </Card>
     </div>
     </>
   )

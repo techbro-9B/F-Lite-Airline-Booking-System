@@ -1,5 +1,5 @@
 /* 
-This file holds the supabase object that allows for client-side operations with supabase
+This file holds the supabase function that allows for client-side operations with supabase
 
 for more info: https://supabase.com/docs/guides/getting-started/tutorials/with-nextjs#supabase-server-side-auth
 Created by Lloyd, march 3, 2026
