@@ -1,7 +1,9 @@
 import { LoginForm } from "@/app/(auth)/components/login-form"
 import { BookingsNavBar } from "@/components/BookingsNavBar"
+import { createClient } from "@/lib/supabase/server"
 import Image from "next/image"
 import Link from "next/link"
+import { redirect } from "next/navigation"
 
 
 
@@ -12,8 +14,14 @@ needs to be cleaned up... alot of junk!⚠️⚠️⚠️
 Created by Lloyd, march 3, 2026
 updated: Lloyd, march 3, 2026 
 */
-export default function UserAccountPage() {
+export default async function UserAccountPage() {
+  
 
+  const supabase = await createClient()
+  const {data:{user}} = await supabase.auth.getUser() // searches if the user's JWT are in the cookies
+
+  if(!user) redirect("/login") // sends the user to the login page if the user's details aren't in the cookies
+   let slogan = "Frequent flyer exploring new destinations"
 
   return (
     <>
@@ -32,10 +40,11 @@ export default function UserAccountPage() {
                   U
                 </div>
               </div>
-              <h1 className="text-4xl md:text-5xl font-bold mb-3">User Name</h1>
-              <p className="text-xl opacity-90 mb-2">user@example.com</p>
+              {/* add the acc user's name here!! */}
+              <h1 className="text-4xl md:text-5xl font-bold mb-3">{user.user_metadata.full_name}</h1>
+              <p className="text-xl opacity-90 mb-2">{user.email}</p>
               <p className="text-lg max-w-2xl mx-auto opacity-95">
-                "Frequent flyer exploring new destinations"
+                {slogan}
               </p>
             </div>
           </div>

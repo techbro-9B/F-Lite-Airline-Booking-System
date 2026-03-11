@@ -18,7 +18,7 @@ import {
 import { Input } from "@/components/ui/input"
 import Link from "next/link"
 import { login } from "../actions"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 
@@ -40,6 +40,8 @@ export function LoginForm({
       const [userpassword, setUserPassword] = useState("")
       const [useremail, setUserEmail] = useState("")
       const [errormessage, setErrorMessage] = useState<string|null>(null)
+      
+    
 
 
       const handleSubmit = async (e: any) => {
@@ -102,6 +104,13 @@ export function LoginForm({
                 </div>
                 <Input id="password" type="password" onChange={(e)=>setUserPassword(e.target.value)} required />
               </Field>
+              {errormessage && (
+                  <Field>
+                    <FieldDescription className="text-destructive">
+                      {errormessage}
+                    </FieldDescription>
+                  </Field>
+                )}
               <Field>
                 <Button type="submit">Login</Button>
                 <FieldDescription className="text-center">

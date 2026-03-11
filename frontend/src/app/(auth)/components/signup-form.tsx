@@ -67,7 +67,7 @@ export function SignupForm({
       }
 
     })
-
+      
     setLoading(false)
     if(error){
       console.error("There is an error with creating user: ", error.message)

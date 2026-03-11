@@ -50,7 +50,7 @@ export const HomeNavBar = () => {
                     Signup
                 </Link>
 
-                <Link className={buttonVariants({variant:'outline', size:"sm"})} href={"/login"}>
+                <Link className={buttonVariants({variant:'outline', size:"sm"})} href={"/account"}>
                     <span className="text-foreground">Login</span> <ArrowRight className='h-5 w-5 text-foreground'/>
                 </Link>
 
