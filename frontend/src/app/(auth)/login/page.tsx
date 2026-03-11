@@ -12,7 +12,7 @@ Login page... not yet implemented
 Created by Lloyd, march 3, 2026
 updated: Lloyd, march 3, 2026 
 */
-export async function LoginPage() {
+export default async function LoginPage() {
 
   // checking if the user can be gotten from the cookies
   const supabase = await createClient() 
