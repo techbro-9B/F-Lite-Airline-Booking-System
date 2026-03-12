@@ -16,10 +16,19 @@ updated: Lloyd, march 3, 2026
 export default async function UserAccountPage() {
   
 
-  const supabase = await createClient()
-  const {data:{user}} = await supabase.auth.getUser() // searches if the user's JWT are in the cookies
+  let user;
+  try{
+    const supabase = await createClient() // searches if the user's JWT are in the cookies
+    const {data:{user:fetchedUser}} = await supabase.auth.getUser()
 
-  if(!user) redirect("/login") // sends the user to the login page if the user's details aren't in the cookies
+    if(!fetchedUser) redirect("/login")
+      user = fetchedUser
+    //Getting the user's profile from public.profiles in the db!
+
+
+  } catch (error){
+    redirect("/error")
+  }
    let slogan = "Frequent flyer exploring new destinations"
 
   return (

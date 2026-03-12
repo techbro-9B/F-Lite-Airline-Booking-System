@@ -27,7 +27,7 @@ const LogoutButton = ({className, children}:LogoutButtonProps) => {
 
         const supabase = await createClient()
         await supabase.auth.signOut()
-        router.push("/login")
+        router.push("/logout")
     
     }
   return (
