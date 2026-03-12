@@ -27,7 +27,11 @@ export default async function UserAccountPage() {
 
 
   } catch (error){
-    redirect("/error")
+    if(!user) {redirect("/login")
+
+    }else{
+      redirect("/error")
+    }
   }
    let slogan = "Frequent flyer exploring new destinations"
 
