@@ -1,6 +1,4 @@
-"use server"
 import { createClient } from '@supabase/supabase-js'
-
 
 import { supabaseClientSide } from './supabase/client'
 // loading plane snapshot from supabase

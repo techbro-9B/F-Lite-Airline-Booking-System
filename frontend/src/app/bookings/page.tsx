@@ -14,6 +14,8 @@ let's get it to work and look a little decent first, then iterate through the co
 up
 
 lol.... <-- lloyd
+
+nvm not worth the struggle <-- hasn
 */
 
 import ConfirmationMenu from "./components/ConfirmationMenu";
@@ -58,7 +60,7 @@ export default function BookingsPage() {
 
   const [filteredBookings, setFilteredBookings] = useState<flightFilterResult[]>([]);
 
-  // ✅ Effect to fetch filtered bookings whenever filters change
+  // Effect to fetch filtered bookings whenever filters change
   useEffect(() => {
     let isMounted = true;
 
