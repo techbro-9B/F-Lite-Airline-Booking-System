@@ -1,4 +1,4 @@
-"use client";
+"use client"
 /*
 
 READ ME README
@@ -18,7 +18,9 @@ lol.... <-- lloyd
 nvm not worth the struggle <-- hasn
 */
 
+import { useRouter } from "next/navigation";
 import ConfirmationMenu from "./components/ConfirmationMenu";
+import {useUserId} from "./getUserUUID"
 import {getFilteredFlightData} from "@/lib/flightQuery"
 import type {flightFilterResult} from "@/lib/flightQuery"
 import "@/app/globals.css";
@@ -29,6 +31,7 @@ import { Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import * as Slider from "@radix-ui/react-slider";
 import { Button } from "@/components/ui/button";
 import { HomeNavBar } from "../homepage/components/HomeNavBar";
+import { setSessionData } from "../paymentGate/sessionData";
 
 // sort arrow function class
 function SortArrow({
@@ -50,6 +53,13 @@ function SortArrow({
 }
 
 export default function BookingsPage() {
+  const router = useRouter();
+  const userId = useUserId((uuid) => {
+    if (!uuid) {
+      router.push("/login")
+    }
+  });
+  
   const [costFilter, setCostFilter] = useState<[number, number]>([0, 1500]);
   const [departureFilter, setDepartureFilter] = useState<[number, number]>([0, 365]);
   const [destinationFilter, setDestinationFilter] = useState<string>("");
@@ -84,9 +94,11 @@ export default function BookingsPage() {
     destination: string,
     departure: string,
     seats: number,
+    origin: string,
   }>({
     destination: "",
     departure: "",
+    origin: "",
     seats: 0,
   });
 
@@ -283,6 +295,7 @@ export default function BookingsPage() {
                     destination: booking.destination,
                     seats: booking.seats,
                     departure: booking.departureFormattedDate + " → In " + booking.departsIn + " day(s)",
+                    origin: booking.origin
                   })
                 }}
               >
