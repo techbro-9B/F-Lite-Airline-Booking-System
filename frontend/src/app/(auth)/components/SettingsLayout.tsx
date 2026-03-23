@@ -1,10 +1,13 @@
-
 "use client"
 
 // Note: Extracted as a separate client component so the page can stay async/server.
 // In your project, split this into its own file: components/SettingsLayout.tsx
 import { useState } from "react"
-import { PersonalInfoPanel, PreferencesPanel, SectionTab, SecurityPanel } from "./ProfileSettings-Functions"
+import { PersonalInfoPanel } from "./PersonalInfoPanel"
+import { SettingsSection } from "@/lib/types"
+import { SecurityPanel } from "./SecurityPanel"
+import { PreferencesPanel } from "./PreferencesPanel"
+
 
 export function SettingsLayout({ user }: { user: any }) {
   const [activeTab, setActiveTab] = useState("personal")
@@ -43,5 +46,29 @@ export function SettingsLayout({ user }: { user: any }) {
       </div>
 
     </div>
+  )
+}
+
+function SectionTab({
+  section,
+  active,
+  onClick,
+}: {
+  section: SettingsSection
+  active: boolean
+  onClick: () => void
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left font-medium transition-all ${
+        active
+          ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg"
+          : "text-gray-600 hover:bg-gray-50"
+      }`}
+    >
+      <span className="text-xl">{section.icon}</span>
+      <span>{section.label}</span>
+    </button>
   )
 }

@@ -1,8 +1,9 @@
 import { BookingsNavBar } from "@/components/BookingsNavBar";
-
-import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
 import { SettingsLayout } from "../../components/SettingsLayout";
+import { createClient } from "@/lib/supabase/client";
+import { redirect } from "next/navigation";
+
+
 
 export default async function ProfileSettingsPage() {
   const supabase = await createClient()
