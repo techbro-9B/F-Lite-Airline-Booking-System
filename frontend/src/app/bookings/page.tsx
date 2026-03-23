@@ -27,7 +27,8 @@ import { Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import * as Slider from "@radix-ui/react-slider";
 import { Button } from "@/components/ui/button";
 import { HomeNavBar } from "../homepage/components/HomeNavBar";
-
+import { createClient } from "@/lib/supabase/client";
+import { BookingsNavBar } from "@/components/BookingsNavBar";
 // sort arrow function class
 function SortArrow({
   active,
@@ -48,6 +49,26 @@ function SortArrow({
 }
 
 export default function BookingsPage() {
+
+  /// Lloyd added this... this is to check if the user exists from the cookies with the page is rendered..
+  const [validuser, setValidUser] = useState(false)
+
+    // checking if the user exists to render somestuff like the logout button.
+    let user
+    useEffect(()=>{
+
+        const fetchUser = async()=>{
+
+            const supabase = await createClient()
+            const {data:{user}} = await supabase.auth.getUser()
+            return user
+        }
+
+        user = fetchUser()
+    },[])
+
+    if(user) setValidUser(true) // if this is the case... certain stuff will be rendered like the custom navbar!
+
   const [costFilter, setCostFilter] = useState<[number, number]>([0, 1500]);
   const [departureFilter, setDepartureFilter] = useState<[number, number]>([0, 365]);
   const [destinationFilter, setDestinationFilter] = useState<string>("");
@@ -89,9 +110,14 @@ export default function BookingsPage() {
   });
 
   return (
- 
+    // below is where the supabase base user thingy is applied
     <div style={{overflow:"hidden", height: "100vh", width: "100vw"}}>
-      <HomeNavBar/>
+      
+      { 
+        validuser? 
+        <HomeNavBar/>: // if no user, this navbar is rendered
+        <BookingsNavBar/> // if the user is logged in... this navbar is rendered.
+                }
       <div className = "w-screen h-screen" style={{flex: 1, position: "absolute", overflow: "hidden", background: "var(--background)" }}>
 
         {/* <ConfirmationMenu/> */}
