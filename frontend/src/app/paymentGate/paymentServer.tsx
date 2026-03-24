@@ -1,6 +1,7 @@
-import { supabaseClientSide } from "@/lib/supabase/client"
+import { createClient } from "@/lib/supabase/client"
 import { getSessionData, isSessionDataSet } from "./sessionData"
 import type {sessionData} from "./sessionData"
+import { create } from "domain";
 
 async function sendData() {
   console.log("ACalled")
@@ -10,8 +11,8 @@ async function sendData() {
   
   try {
     const session: sessionData = await getSessionData();
-
-    const { data, error } = await supabaseClientSide
+    const supabase = await createClient()
+    const { data, error } = await supabase
       .from("user_flight_bookings")
       .insert([
         {
