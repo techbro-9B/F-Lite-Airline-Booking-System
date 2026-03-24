@@ -8,7 +8,7 @@ import * as z from "zod";
 import { Form } from "@/components/ui/form";
 import CheckoutForm from "../components/CheckoutForm";
 import OrderSummary from "../components/OrderSummary";
-
+import { BookingsNavBar } from "@/components/BookingsNavBar";
 export const checkoutSchema = z.object({
     fullName: z.string().min(2, "Name is required"),
     email: z.string().email({ message: "Invalid email address" }),
@@ -44,25 +44,29 @@ function CheckoutContent() {
     }
 
     return (
-        <div className="container mx-auto p-4 md:p-8 max-w-6xl">
-            <h1 className="text-3xl font-bold mb-8">Complete Your Booking</h1>
+        <>
+            <BookingsNavBar/>
+            <div className="container mx-auto p-4 md:p-8 max-w-6xl">
+            
+                <h1 className="text-3xl font-bold mb-8">Complete Your Booking</h1>
 
-            <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-cols-1 lg:grid-cols-12 gap-8">
 
-                    <div className="lg:col-span-8 space-y-6">
-                        <CheckoutForm />
-                    </div>
-
-                    <div className="lg:col-span-4">
-                        <div className="sticky top-8">
-                            <OrderSummary seatCount={seatCount} />
+                        <div className="lg:col-span-8 space-y-6">
+                            <CheckoutForm />
                         </div>
-                    </div>
 
-                </form>
-            </Form>
-        </div>
+                        <div className="lg:col-span-4">
+                            <div className="sticky top-8">
+                                <OrderSummary/>
+                            </div>
+                        </div>
+
+                    </form>
+                </Form>
+            </div>
+        </>
     );
 }
 

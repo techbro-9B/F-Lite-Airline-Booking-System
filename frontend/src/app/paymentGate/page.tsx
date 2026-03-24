@@ -6,18 +6,21 @@ import { HomeNavBar } from "../homepage/components/HomeNavBar";
 import { useState, useEffect } from "react";
 import { sendData } from "./paymentServer"
 import { Button } from "@/components/ui/button";
+import {useRouter} from "next/navigation";
 
 export default function PaymentGateway() {
   const data: sessionData = getSessionData();
   const [isLoading, setIsLoading] = useState(true);
-
+const router = useRouter();
   useEffect(() => {
     let timer: NodeJS.Timeout
     
     sendData()
       .then(() => {
         timer = setTimeout(
-          () => setIsLoading(false),
+          () => {
+            setIsLoading(false)
+          },
           1000 + Math.random() * 1500
         );
       })
@@ -43,8 +46,15 @@ export default function PaymentGateway() {
         }}>
           {isLoading
             ? <LoadingDots />
-            : <Button style = {{width: "100%",
-          height: "100%",}} onClick={() => { /* handle next */ }}>
+            : <Button
+            
+            onClick={() => {
+              
+              router.push("../account/history");
+            }}
+            style = {{width: "100%",
+            height: "100%",
+            }}>
               Next
             </Button>
           }
