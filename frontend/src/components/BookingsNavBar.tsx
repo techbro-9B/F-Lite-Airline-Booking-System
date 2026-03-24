@@ -5,7 +5,7 @@ Thie navbar need to be fixed for small screens.. some buttons don't show..<--- f
 Thats just decoration though, rn need functionality!
 
 Created by Lloyd, Feb 22, 2026
-updated: Lloyd, march 11, 2026 
+updated: Lloyd, march 21, 2026 
 */
 
 import { MaxWidthWrapper } from '@/components/MaxWidthWrapper'
@@ -48,7 +48,7 @@ export const BookingsNavBar = () => {
 
             {/**Want the logo in the navbar as always.  */}
 
-            <Link href = "/" className = {buttonVariants({variant:'link'})} >
+            <Link href = "/bookings" className = {buttonVariants({variant:'link'})} >
                 <Image src={"/F-lite-logo-Transparent.svg"}
                 alt = "F-lite Logo"
                 height={108}

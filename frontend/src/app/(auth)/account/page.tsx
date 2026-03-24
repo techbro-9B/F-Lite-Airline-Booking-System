@@ -1,17 +1,16 @@
-
 import { BookingsNavBar } from "@/components/BookingsNavBar"
+import { buttonVariants } from "@/components/ui/button"
 import { createClient } from "@/lib/supabase/server"
-
+import { cn } from "@/lib/utils"
+import Link from "next/link"
 import { redirect } from "next/navigation"
-
-
 
 /* 
 Basic ui user's account.
 needs to be cleaned up... alot of junk!⚠️⚠️⚠️
 
 Created by Lloyd, march 3, 2026
-updated: Lloyd, march 3, 2026 
+updated: Lloyd, march 22, 2026 
 */
 export default async function UserAccountPage() {
   
@@ -91,12 +90,16 @@ export default async function UserAccountPage() {
             <div className="bg-white rounded-2xl shadow-xl p-6">
               <h4 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h4>
               <div className="space-y-3">
-                <button className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 px-6 rounded-xl font-medium hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl">
-                  Book New Flight ✈️
-                </button>
-                <button className="w-full border border-gray-200 text-gray-700 py-3 px-6 rounded-xl font-medium hover:bg-gray-50 transition-all">
-                  Edit Profile
-                </button>
+                <Link href={"/bookings"}>
+                  <button className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 px-6 rounded-xl font-medium hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl">
+                    Book New Flight ✈️
+                  </button>
+                </Link>
+                <Link href={"/account/profilesettings"}>
+                  <button className="w-full border border-gray-200 text-gray-700 py-3 px-6 rounded-xl font-medium hover:bg-gray-50 transition-all">
+                    Edit Profile
+                  </button>
+                </Link>
               </div>
             </div>
           </div>
@@ -105,8 +108,9 @@ export default async function UserAccountPage() {
           <div className="lg:col-span-2 space-y-6">
             {/* Flights Section */}
             <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-              <div className="bg-gradient-to-r from-gray-900 to-gray-800 px-8 py-6 text-white">
+              <div className="flex bg-gradient-to-r from-gray-900 to-gray-800 px-8 py-6 text-white justify-between">
                 <h2 className="text-2xl font-bold">Flight History</h2>
+                <Link href={"/account/history"} className={cn(buttonVariants({variant: "secondary"}))}>View all history</Link>
               </div>
               <div className="p-8 space-y-4">
                 {/* Flight Card */}
@@ -124,7 +128,7 @@ export default async function UserAccountPage() {
                   </span>
                 </div>
                 
-                {/* Empty State Alternative */}
+                {/* empty state alternative */}
                 {/* 
                 <div className="text-center py-16">
                   <div className="w-24 h-24 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
