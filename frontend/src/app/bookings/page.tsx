@@ -1,4 +1,4 @@
-"use client";
+"use client"
 /*
 
 READ ME README
@@ -14,9 +14,13 @@ let's get it to work and look a little decent first, then iterate through the co
 up
 
 lol.... <-- lloyd
+
+nvm not worth the struggle <-- hasn
 */
 
+import { useRouter } from "next/navigation";
 import ConfirmationMenu from "./components/ConfirmationMenu";
+import {useUserId} from "./getUserUUID"
 import {getFilteredFlightData} from "@/lib/flightQuery"
 import type {flightFilterResult} from "@/lib/flightQuery"
 import "@/app/globals.css";
@@ -103,9 +107,11 @@ export default function BookingsPage() {
     destination: string,
     departure: string,
     seats: number,
+    origin: string,
   }>({
     destination: "",
     departure: "",
+    origin: "",
     seats: 0,
   });
 
@@ -307,6 +313,7 @@ export default function BookingsPage() {
                     destination: booking.destination,
                     seats: booking.seats,
                     departure: booking.departureFormattedDate + " → In " + booking.departsIn + " day(s)",
+                    origin: booking.origin
                   })
                 }}
               >

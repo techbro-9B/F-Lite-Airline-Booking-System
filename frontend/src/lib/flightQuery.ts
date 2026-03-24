@@ -34,6 +34,7 @@ const flightLookup: { [destination_id: number]: {
     reserved_seats: number,
     departureDate: Date, // actual date of departure
     departsIn: number,  // number of days before departure
+    origin_id: number,
     cost: number,
 } } = {}
 flightsData?.forEach((flight: any) => {
@@ -45,6 +46,7 @@ flightsData?.forEach((flight: any) => {
         flight_id: flight.flight_id,
         plane_id: flight.plane_id,
         destination_id: flight.destination_id,
+        origin_id: flight.origin_id,
         reserved_seats: flight.reserved_seats,
         departureDate: departDate,
         departsIn: diffInDays,
@@ -87,6 +89,7 @@ export type flightFilter = {
 }
 export type flightFilterResult = {
     destination: string,
+    origin: string,
     seats: number,
     departsIn: number,
     departureFormattedDate: string,
@@ -150,6 +153,7 @@ async function getFilteredFlightData(
     const flightsWithSeats = await Promise.all(
       filteredFlights.map(async (flight) => {
         const plane = await getPlaneData(flight.plane_id);
+
         const availableSeats = plane.total_seats - flight.reserved_seats;
         return {
           flight,
@@ -220,10 +224,13 @@ async function getFilteredFlightData(
       const plane = await getPlaneData(flight.plane_id);
       const destination = await getDestinationData(flight.destination_id);
       const destinationStr = `${destination.city}, ${destination.country}`
+      const origin = await getDestinationData(flight.origin_id);
+      const originStr = `${origin.city}, ${origin.country}`
       const availableSeats = plane.total_seats - flight.reserved_seats;
 
       return {
         destination: destinationStr,
+        origin: originStr,
         seats: availableSeats,
         departsIn: flight.departsIn,
         departureFormattedDate: flight.departureDate.toLocaleString(),

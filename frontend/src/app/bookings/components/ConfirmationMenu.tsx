@@ -13,6 +13,7 @@ type ConfirmationMenuProps = {
 type confirmationData = {
     destination: string,
     departure: string,
+    origin: string,
     seats: number,
   }
 
@@ -35,6 +36,8 @@ export default function ConfirmationMenu({
             }}>
                 <CardTitle style={{fontWeight: "bold", fontSize: 35}}>Confirm Order</CardTitle>
                 <CardContent>
+                    <div>Origin: {confirmationData.origin}</div>
+
                     <div>Destination: {confirmationData.destination}</div>
                     
                     <div>Departure: {confirmationData.departure}</div>
