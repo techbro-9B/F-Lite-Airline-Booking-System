@@ -58,7 +58,7 @@ export default function BookingsPage() {
 
   const [filteredBookings, setFilteredBookings] = useState<flightFilterResult[]>([]);
 
-  // ✅ Effect to fetch filtered bookings whenever filters change
+  //  Effect to fetch filtered bookings whenever filters change
   useEffect(() => {
     let isMounted = true;
 

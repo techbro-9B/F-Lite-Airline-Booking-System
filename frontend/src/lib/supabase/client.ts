@@ -16,4 +16,3 @@ export function createClient() {
   );
 }
 
-export const supabaseClientSide = createClient() // can import this object anywhere int client components

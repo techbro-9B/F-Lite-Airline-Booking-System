@@ -1,17 +1,18 @@
 "use server"
-import { createClient } from '@supabase/supabase-js'
+import { createClient } from "./supabase/client"
 
 
-import { supabaseClientSide } from './supabase/client'
+//import { supabaseClientSide } from './supabase/client'
 // loading plane snapshot from supabase
 
-const { data: flightsData, error: flightsError } = await supabaseClientSide
+const supabase = await createClient()
+const { data: flightsData, error: flightsError } = await supabase
   .from('flights')
   .select('*')
-const { data: planesData, error: planesError } = await supabaseClientSide
+const { data: planesData, error: planesError } = await supabase
   .from('planes')
   .select('*')
-const { data: destinationsData, error: destinationsError } = await supabaseClientSide
+const { data: destinationsData, error: destinationsError } = await supabase
   .from('destinations')
   .select('*')
   
