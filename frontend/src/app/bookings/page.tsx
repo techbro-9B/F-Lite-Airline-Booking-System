@@ -14,18 +14,15 @@ import { Button } from "@/components/ui/button";
 import { BookingsNavBar } from "@/components/BookingsNavBar";
 import { createClient } from "@/lib/supabase/client";
 
-// ─── Sort arrow ───────────────────────────────────────────────────────────────
 
 function SortArrow({ active, ascending }: { active: boolean; ascending: boolean | null }) {
   if (!active) return <span className="opacity-30">↕</span>
   return <span className="ml-1">{ascending ? "↑" : "↓"}</span>
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
-
 export default function BookingsPage() {
 
-  // ── Auth ───────────────────────────────────────────────────────────────────
+  
   const [validUser, setValidUser] = useState(false)
 
   useEffect(() => {
@@ -84,7 +81,7 @@ export default function BookingsPage() {
     }))
   }
 
-  // ── Open confirmation for a booking row ───────────────────────────────────
+  // Opens confirmation for a booking row 
   const openConfirm = (booking: flightFilterResult) => {
     setFlightDetails({
       flight_id:      booking.flightId,
@@ -113,7 +110,7 @@ export default function BookingsPage() {
     setConfirmOpen(true)
   }
 
-  // ── Render 
+  // render
   return (
     <div style={{ overflow: "hidden", height: "100vh", width: "100vw" }}>
 

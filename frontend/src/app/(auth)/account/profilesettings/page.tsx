@@ -6,10 +6,24 @@ import { redirect } from "next/navigation";
 
 
 export default async function ProfileSettingsPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  let user;
+    try{
+      const supabase = await createClient() // searches if the user's JWT are in the cookies
+      const {data:{user:fetchedUser}} = await supabase.auth.getUser()
+  
+      if(fetchedUser) redirect("/login")
+        user = fetchedUser
+      
+      // getting the user's profile from user_profile
 
-  if (!user) redirect("/login")
+  
+    } catch (error){
+      if(!user) {redirect("/login")
+  
+      }else{
+        redirect("/error")
+      }
+    }
 
   return (
     <>
@@ -24,11 +38,11 @@ export default async function ProfileSettingsPage() {
               <div className="absolute inset-0 bg-black/10" />
               <div className="relative z-10 max-w-4xl mx-auto flex items-center gap-6">
                 <div className="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center text-3xl font-bold flex-shrink-0">
-                  {user.user_metadata?.full_name?.[0] ?? "U"}
+                  { "U"}
                 </div>
                 <div>
                   <h1 className="text-3xl md:text-4xl font-bold">Profile Settings</h1>
-                  <p className="text-white/80 mt-1">{user.user_metadata?.full_name} · {user.email}</p>
+                  <p className="text-white/80 mt-1">{"user fullname here"} · {"user@email"}</p>
                 </div>
               </div>
             </div>
