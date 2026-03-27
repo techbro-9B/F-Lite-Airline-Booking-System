@@ -10,17 +10,17 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { useEffect, useState } from "react";
+import { setSessionData } from "@/app/paymentGate/sessionData";
+import { useUserId } from "../getUserUUID";
 
 // types that'll be used
 type ConfirmationMenuProps = {
   open:           boolean
   close:          () => void
-  flightDetails?: FlightDetails | null
+  flightDetails:  FlightDetails
   seatsWanted:    number
   setSeatsWanted: (n: number) => void
 };
-
-
 
 // the confrimation menus on the same page as the bookings page
 export default function ConfirmationMenu({
@@ -32,18 +32,8 @@ export default function ConfirmationMenu({
 }: ConfirmationMenuProps) {
   const router = useRouter()
 
-  const [validUser, setValidUser] = useState(false)
+  const uuid = useUserId()
 
-  useEffect(() => {
-    const getUser = async () => {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      setValidUser(!!user) // !! converts user object to true, null to false
-    }
-    getUser()
-  }, [])
-
-  
   if (!open) return null
 
   const seatClass  = flightDetails?.pricing?.seat_class ?? "economy"
@@ -51,7 +41,6 @@ export default function ConfirmationMenu({
   const maxSeats   = flightDetails?.pricing?.seats_available ?? 1
   const total      = priceEach * seatsWanted;
 
-  
   return (
     // Backdrop
     <div
@@ -149,7 +138,15 @@ export default function ConfirmationMenu({
             >
               Cancel
             </Button>
-            <Link href={"paymentgate"}
+
+            <Link onClick={()=>{
+              setSessionData({
+                flightId: flightDetails.flight_id,
+                uuid: uuid.userId,
+                seatsBooked: seatsWanted,
+                total_price: total
+              })
+            }} href={"bookings/checkout"}
               className={cn(buttonVariants({variant:"default"}))}
             >
               Next →

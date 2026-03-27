@@ -32,7 +32,7 @@ const router = useRouter();
   return (
     <>
       <HomeNavBar />
-      <div style={{ fontSize: 20, fontWeight: 500, position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)"}}>Please wait while we process your payment</div>
+      <div style={{ fontSize: 20, fontWeight: 500, position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)"}}>{isLoading ? "Please wait while we process your payment" : "Complete!"}</div>
 
         <div style={{
           display: "flex",

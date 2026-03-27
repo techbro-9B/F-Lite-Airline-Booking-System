@@ -1,8 +1,8 @@
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { PlaneTakeoff, Calendar } from "lucide-react";
-import { getSessionData } from "@/app/paymentgate/sessionData";
-import { sessionData } from "@/app/paymentgate/sessionData";
+import { getSessionData } from "@/app/paymentGate/sessionData";
+import type { sessionData } from "@/app/paymentGate/sessionData";
 import { getFlightData, getDestinationData, getPlaneData } from "@/lib/flightQuery";
 import { useEffect, useState } from "react";
 
