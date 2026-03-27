@@ -33,7 +33,7 @@ export default function ConfirmationMenu({
   const router = useRouter()
 
   const [validUser, setValidUser] = useState(false)
-
+  let user;
   useEffect(() => {
     const getUser = async () => {
       const supabase = createClient()
@@ -60,7 +60,7 @@ export default function ConfirmationMenu({
     >
       {/* Blur layer */}
       <div style={{ height: "100%", width: "100%", backdropFilter: "blur(6px)", backgroundColor: "rgba(0,0,0,0.2)" }} />
-
+      <span>{user.user_metadata}</span>
       {/* Modal card — stop clicks from bubbling to backdrop */}
       <Card
         onClick={(e) => e.stopPropagation()}
