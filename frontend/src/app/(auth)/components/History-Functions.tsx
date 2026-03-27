@@ -307,7 +307,7 @@ export function StatsBar({ flights }: { flights: Flight[] }) {
   )
 }
  
-// ─── Main Client Component ────────────────────────────────────────────────────
+// Main Client Component 
  
 export function FlightHistoryContent({ user }: { user: any }) {
   const [filter, setFilter] = useState<FlightStatus | "all">("all")

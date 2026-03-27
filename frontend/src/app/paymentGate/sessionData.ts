@@ -3,6 +3,8 @@ type sessionData = {
     uuid: string,
     seatsBooked: number,
 }
+
+
 var sessionData: sessionData = {
     flightId: 2,
     seatsBooked: 1,
@@ -19,5 +21,7 @@ function isSessionDataSet() {
 function getSessionData() {
     return sessionData
 }
+
+
 
 export {setSessionData, getSessionData, isSessionDataSet, sessionData}

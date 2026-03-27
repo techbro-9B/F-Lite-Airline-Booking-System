@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/client"
 import { getSessionData, isSessionDataSet } from "./sessionData"
 import type {sessionData} from "./sessionData"
-import { create } from "domain";
+
 
 async function sendData() {
   console.log("ACalled")

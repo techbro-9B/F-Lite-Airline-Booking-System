@@ -48,6 +48,18 @@ export interface Flight {
   price: string
 }
 
+
+export interface FlightDetails {
+  flight_id: number
+  flight_number: string
+  departure_time?: string
+  arrival_time?: string
+  status: string
+  origin: { name: string; airport_code: string; city: string }
+  destination: { name: string; airport_code: string; city: string }
+  plane?: { plane_name: string }
+  pricing?: { seat_class: string; base_price: number; seats_available: number } | null
+}
 // used for the user settings
 export interface SettingsSection {
   id: string
