@@ -3,18 +3,129 @@
 Functions for the history page.
 
 Created by Lloyd, March 21, 2026
-updated: Lloyd, March 21, 2026
+updated: Lloyd, March 27, 2026
 */
-
 
 import { useState } from "react";
 import { MOCK_FLIGHTS } from "@/lib/mock_data";
+import { createClient } from "@/lib/supabase/client";
 import { Flight, FlightStatus, STATUS_CONFIG } from "@/lib/types";
 import Link from "next/link";
 
+
+ 
+// what rendered! The functions that are used are after this function
+export function FlightHistoryContent({ user_profile }: { user_profile: any }) {
+  const [filter, setFilter] = useState<FlightStatus | "all">("all")
+  const [selectedFlight, setSelectedFlight] = useState<Flight | null>(null)
+  const [search, setSearch] = useState("")
+  
+  const filtered = MOCK_FLIGHTS.filter((f) => {
+    const matchesFilter = filter === "all" || f.status === filter
+    const matchesSearch =
+      search === "" ||
+      f.destination.toLowerCase().includes(search.toLowerCase()) ||
+      f.origin.toLowerCase().includes(search.toLowerCase()) ||
+      f.flightNumber.toLowerCase().includes(search.toLowerCase()) ||
+      f.destinationCode.toLowerCase().includes(search.toLowerCase()) ||
+      f.originCode.toLowerCase().includes(search.toLowerCase())
+    return matchesFilter && matchesSearch
+  })
+ 
+  const counts = {
+    all: MOCK_FLIGHTS.length,
+    upcoming: MOCK_FLIGHTS.filter((f) => f.status === "upcoming").length,
+    completed: MOCK_FLIGHTS.filter((f) => f.status === "completed").length,
+    cancelled: MOCK_FLIGHTS.filter((f) => f.status === "cancelled").length,
+  }
+ 
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-5xl space-y-8">
+ 
+        {/* Header Banner */}
+        <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
+          <div className="bg-gradient-to-r from-blue-600 to-indigo-700 px-8 py-10 text-white relative overflow-hidden">
+            <div className="absolute inset-0 bg-black/10" />
+            <div className="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="flex items-center gap-5">
+                <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center text-2xl font-bold">
+                  {user_profile.f_name ? "U": user_profile.f_name}
+                </div>
+                <div>
+                  <h1 className="text-3xl md:text-4xl font-bold">Flight History</h1>
+                  <p className="text-white/80 mt-1">{user_profile.f_name + user_profile.l_name}</p>
+                </div>
+              </div>
+              <Link href={"/bookings"}>
+                <button className="self-start sm:self-auto bg-white text-blue-700 font-semibold px-5 py-2.5 rounded-xl hover:bg-blue-50 transition-all shadow-lg text-sm">
+                  Book New Flight ✈️
+                </button>
+              </Link>
+            </div>
+          </div>
+        </div>
+ 
+        {/* Stats */}
+        <StatsBar flights={MOCK_FLIGHTS} />
+ 
+        {/* Controls */}
+        <div className="bg-white rounded-2xl shadow-xl p-6 space-y-4">
+          {/* Search */}
+          <div className="relative">
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search by destination, origin, or flight number…"
+              className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder-gray-400 transition-all"
+            />
+          </div>
+ 
+          {/* Filter tabs */}
+          <FilterTabs active={filter} onChange={setFilter} counts={counts} />
+        </div>
+ 
+        {/* Flight List */}
+        <div className="space-y-4">
+          {filtered.length > 0 ? (
+            filtered.map((flight) => (
+              <FlightCard
+                key={flight.id}
+                flight={flight}
+                onClick={() => setSelectedFlight(flight)}
+              />
+            ))
+          ) : (
+            <div className="bg-white rounded-2xl shadow-xl p-16 text-center">
+              <div className="w-20 h-20 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center text-4xl">
+                ✈️
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">No flights found</h3>
+              <p className="text-gray-500 text-sm">
+                {search ? `No results for "${search}"` : "No flights in this category yet."}
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+ 
+      {/* Detail Drawer */}
+      <FlightDetailDrawer
+        flight={selectedFlight}
+        onClose={() => setSelectedFlight(null)}
+      />
+    </div>
+  )
+}
+
+
+
+// thhe flight cards that are displayed!
 export function FlightCard({ flight, onClick }: { flight: Flight; onClick: () => void }) {
   const status = STATUS_CONFIG[flight.status]
- 
+  
   return (
     <button
       onClick={onClick}
@@ -230,8 +341,7 @@ export function FlightDetailDrawer({
   )
 }
  
-// ─── Filter Tabs ──────────────────────────────────────────────────────────────
- 
+// the filtering tabs 
 export function FilterTabs({
   active,
   onChange,
@@ -274,7 +384,7 @@ export function FilterTabs({
   )
 }
  
-// ─── Stats Bar ────────────────────────────────────────────────────────────────
+// stat bar
  
 export function StatsBar({ flights }: { flights: Flight[] }) {
   const completed = flights.filter((f) => f.status === "completed")
@@ -303,113 +413,6 @@ export function StatsBar({ flights }: { flights: Flight[] }) {
           <p className="text-xs text-gray-500 mt-0.5">{label}</p>
         </div>
       ))}
-    </div>
-  )
-}
- 
-// Main Client Component 
- 
-export function FlightHistoryContent({ user }: { user: any }) {
-  const [filter, setFilter] = useState<FlightStatus | "all">("all")
-  const [selectedFlight, setSelectedFlight] = useState<Flight | null>(null)
-  const [search, setSearch] = useState("")
- 
-  const filtered = MOCK_FLIGHTS.filter((f) => {
-    const matchesFilter = filter === "all" || f.status === filter
-    const matchesSearch =
-      search === "" ||
-      f.destination.toLowerCase().includes(search.toLowerCase()) ||
-      f.origin.toLowerCase().includes(search.toLowerCase()) ||
-      f.flightNumber.toLowerCase().includes(search.toLowerCase()) ||
-      f.destinationCode.toLowerCase().includes(search.toLowerCase()) ||
-      f.originCode.toLowerCase().includes(search.toLowerCase())
-    return matchesFilter && matchesSearch
-  })
- 
-  const counts = {
-    all: MOCK_FLIGHTS.length,
-    upcoming: MOCK_FLIGHTS.filter((f) => f.status === "upcoming").length,
-    completed: MOCK_FLIGHTS.filter((f) => f.status === "completed").length,
-    cancelled: MOCK_FLIGHTS.filter((f) => f.status === "cancelled").length,
-  }
- 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-5xl space-y-8">
- 
-        {/* Header Banner */}
-        <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
-          <div className="bg-gradient-to-r from-blue-600 to-indigo-700 px-8 py-10 text-white relative overflow-hidden">
-            <div className="absolute inset-0 bg-black/10" />
-            <div className="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <div className="flex items-center gap-5">
-                <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center text-2xl font-bold">
-                  {user?.user_metadata?.full_name?.[0] ?? "U"}
-                </div>
-                <div>
-                  <h1 className="text-3xl md:text-4xl font-bold">Flight History</h1>
-                  <p className="text-white/80 mt-1">{user?.user_metadata?.full_name}</p>
-                </div>
-              </div>
-              <Link href={"/"}>
-                <button className="self-start sm:self-auto bg-white text-blue-700 font-semibold px-5 py-2.5 rounded-xl hover:bg-blue-50 transition-all shadow-lg text-sm">
-                  Book New Flight ✈️
-                </button>
-              </Link>
-            </div>
-          </div>
-        </div>
- 
-        {/* Stats */}
-        <StatsBar flights={MOCK_FLIGHTS} />
- 
-        {/* Controls */}
-        <div className="bg-white rounded-2xl shadow-xl p-6 space-y-4">
-          {/* Search */}
-          <div className="relative">
-            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by destination, origin, or flight number…"
-              className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder-gray-400 transition-all"
-            />
-          </div>
- 
-          {/* Filter tabs */}
-          <FilterTabs active={filter} onChange={setFilter} counts={counts} />
-        </div>
- 
-        {/* Flight List */}
-        <div className="space-y-4">
-          {filtered.length > 0 ? (
-            filtered.map((flight) => (
-              <FlightCard
-                key={flight.id}
-                flight={flight}
-                onClick={() => setSelectedFlight(flight)}
-              />
-            ))
-          ) : (
-            <div className="bg-white rounded-2xl shadow-xl p-16 text-center">
-              <div className="w-20 h-20 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center text-4xl">
-                ✈️
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">No flights found</h3>
-              <p className="text-gray-500 text-sm">
-                {search ? `No results for "${search}"` : "No flights in this category yet."}
-              </p>
-            </div>
-          )}
-        </div>
-      </div>
- 
-      {/* Detail Drawer */}
-      <FlightDetailDrawer
-        flight={selectedFlight}
-        onClose={() => setSelectedFlight(null)}
-      />
     </div>
   )
 }

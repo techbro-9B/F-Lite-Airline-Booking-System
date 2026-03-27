@@ -26,6 +26,20 @@ export const STATUS_CONFIG: Record<FlightStatus, { label: string; bg: string; te
 }
 
 
+export interface  UserType{
+  uuid: string,
+  f_name: string,
+  l_name: string,
+  email: string, 
+  phone:string,
+  date_of_brith: string,
+  passport_number: string,
+  rank: string
+  meal_preference: string
+  create_at: string
+  updated_at: string
+}
+
 /// Temporary types for the history...
 export type FlightStatus = "upcoming" | "completed" | "cancelled"
  
