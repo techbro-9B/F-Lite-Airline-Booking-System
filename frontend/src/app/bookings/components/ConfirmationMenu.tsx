@@ -8,16 +8,18 @@ import Image from "next/image";
 import { FlightDetails } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-
+import { createClient } from "@/lib/supabase/client";
+import { useEffect, useState } from "react";
 
 // types that'll be used
 type ConfirmationMenuProps = {
-  open:           boolean;
-  close:          () => void;
-  flightDetails?: FlightDetails | null;
-  seatsWanted:    number;
-  setSeatsWanted: (n: number) => void;
+  open:           boolean
+  close:          () => void
+  flightDetails?: FlightDetails | null
+  seatsWanted:    number
+  setSeatsWanted: (n: number) => void
 };
+
 
 
 // the confrimation menus on the same page as the bookings page
@@ -28,13 +30,25 @@ export default function ConfirmationMenu({
   seatsWanted,
   setSeatsWanted,
 }: ConfirmationMenuProps) {
-  const router = useRouter();
+  const router = useRouter()
 
-  if (!open) return null;
+  const [validUser, setValidUser] = useState(false)
 
-  const seatClass  = flightDetails?.pricing?.seat_class ?? "economy";
-  const priceEach  = flightDetails?.pricing?.base_price ?? 0;
-  const maxSeats   = flightDetails?.pricing?.seats_available ?? 1;
+  useEffect(() => {
+    const getUser = async () => {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      setValidUser(!!user) // !! converts user object to true, null to false
+    }
+    getUser()
+  }, [])
+
+  
+  if (!open) return null
+
+  const seatClass  = flightDetails?.pricing?.seat_class ?? "economy"
+  const priceEach  = flightDetails?.pricing?.base_price ?? 0
+  const maxSeats   = flightDetails?.pricing?.seats_available ?? 1
   const total      = priceEach * seatsWanted;
 
   
