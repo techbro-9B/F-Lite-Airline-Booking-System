@@ -50,7 +50,7 @@ const router = useRouter();
             
             onClick={() => {
               
-              router.push("../account/history");
+              router.push("../account");
             }}
             style = {{width: "100%",
             height: "100%",

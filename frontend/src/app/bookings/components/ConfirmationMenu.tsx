@@ -19,6 +19,7 @@ type ConfirmationMenuProps = {
   close:          () => void
   flightDetails:  FlightDetails
   seatsWanted:    number
+  canProceed: boolean
   setSeatsWanted: (n: number) => void
 };
 
@@ -28,6 +29,7 @@ export default function ConfirmationMenu({
   close,
   flightDetails,
   seatsWanted,
+  canProceed,
   setSeatsWanted,
 }: ConfirmationMenuProps) {
   const router = useRouter()
@@ -144,9 +146,9 @@ export default function ConfirmationMenu({
                 flightId: flightDetails.flight_id,
                 uuid: uuid.userId,
                 seatsBooked: seatsWanted,
-                total_price: total
+                total_price: total + 120.5
               })
-            }} href={"bookings/checkout"}
+            }} href={canProceed ? "bookings/checkout" : "/login"}
               className={cn(buttonVariants({variant:"default"}))}
             >
               Next →

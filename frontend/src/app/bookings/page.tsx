@@ -13,6 +13,7 @@ import * as Slider from "@radix-ui/react-slider";
 import { Button } from "@/components/ui/button";
 import { BookingsNavBar } from "@/components/BookingsNavBar";
 import { createClient } from "@/lib/supabase/client";
+import { HomeNavBar } from "../homepage/components/HomeNavBar";
 
 
 function SortArrow({ active, ascending }: { active: boolean; ascending: boolean | null }) {
@@ -96,7 +97,7 @@ export default function BookingsPage() {
       },
       destination: {
         name:         booking.destination,
-        airport_code: booking.destinationCode ?? '',
+        airport_code: booking.destCode ?? '',
         city:         booking.destination,
       },
       plane:   { plane_name: booking.planeName },
@@ -115,11 +116,12 @@ export default function BookingsPage() {
     <div style={{ overflow: "hidden", height: "100vh", width: "100vw" }}>
 
       {/* Navbar — show BookingsNavBar when user logged in, plain nav when not */}
-      {validUser ? <BookingsNavBar /> : <BookingsNavBar />}
+      {validUser ? <BookingsNavBar /> : <HomeNavBar />}
 
       <ConfirmationMenu
         open={confirmOpen}
         close={() => setConfirmOpen(false)}
+        canProceed={validUser} // if not logged in, cant proceed
         flightDetails={flightDetails}
         seatsWanted={seatsWanted}
         setSeatsWanted={setSeatsWanted}

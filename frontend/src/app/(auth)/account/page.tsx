@@ -96,8 +96,8 @@ export default async function UserAccountPage() {
                 
                 <div className="p-4 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl">
                   <p className="text-sm font-medium text-gray-600 mb-1">Recent Flight</p>
-                  <p className="font-semibold text-gray-900">{bookings[0].destination_name}</p>
-                  <p className="text-xs text-gray-500">{bookings[0].departure_date}</p>
+                  <p className="font-semibold text-gray-900">{bookings[0]?.destination_name}</p>
+                  <p className="text-xs text-gray-500">{bookings[0]?.departure_date}</p>
                 </div>
               </div>
             </div>
@@ -135,9 +135,9 @@ export default async function UserAccountPage() {
                     ✈️
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold text-xl text-gray-900 truncate">{bookings[0].destination_name}</h4>
-                    <p className="text-sm text-gray-600 mb-1">FL-{bookings[0].flight_id}</p>
-                    <p className="text-sm text-gray-500">{bookings[0].departure_date} • Confirmed</p>
+                    <h4 className="font-semibold text-xl text-gray-900 truncate">{bookings[0]?.destination_name}</h4>
+                    <p className="text-sm text-gray-600 mb-1">FL-{bookings[0]?.flight_id}</p>
+                    <p className="text-sm text-gray-500">{bookings[0]?.departure_date} • Confirmed</p>
                   </div>
                   <span className="px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-medium ml-6">
                     ACTIVE
@@ -174,7 +174,7 @@ export default async function UserAccountPage() {
                   <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center mr-3">
                     ✈️
                   </div>
-                  <span>Booked flight to {bookings[0].destination_name}</span>
+                  <span>Booked flight to {bookings[0]?.destination_name}</span>
                 </div>
               </div>
             </div>

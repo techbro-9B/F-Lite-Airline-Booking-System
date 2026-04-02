@@ -82,7 +82,7 @@ export default function OrderSummary() {
                         </div>
                         <div className="flex flex-col items-end">
                             <span className="text-2xl font-bold">{checkoutData.destCode}</span>
-                            <span className="text-sm text-muted-foreground">{checkoutData.destName}</span>
+                            <span className="text-sm text-muted-foreground align-right">{checkoutData.destName}</span>
                         </div>
                     </div>
                     <div className="flex items-center text-sm text-muted-foreground pt-2">
