@@ -4,7 +4,8 @@ import { createClient } from "@/lib/supabase/server"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
 import { redirect } from "next/navigation"
-
+import { getUserBookingData, getUserRecentBookings } from "@/lib/UserQueries"
+import { date } from "zod"
 /* 
 Basic ui user's account.
 needs to be cleaned up... alot of junk!⚠️⚠️⚠️
@@ -16,6 +17,10 @@ export default async function UserAccountPage() {
   
 
   let user;
+  var user_data
+  let slogan = "Frequent flyer exploring new destinations"
+
+  // user retrieval!
   try{
     const supabase = await createClient() // searches if the user's JWT are in the cookies
     const {data:{user:fetchedUser}} = await supabase.auth.getUser()
@@ -23,8 +28,9 @@ export default async function UserAccountPage() {
     if(!fetchedUser) redirect("/login")
       user = fetchedUser
     //Getting the user's profile from public.profiles in the db!
-
-
+    const {data, error} = await supabase.from('user_profiles').select('*').eq('uuid', user.id) // ahhh w/ .single() returns an array!
+    if(data != null)user_data = data[0]
+    if(error) console.log("Error in user retrieval (possible RLS problem): ",error)
   } catch (error){
     if(!user) {redirect("/login")
 
@@ -32,8 +38,17 @@ export default async function UserAccountPage() {
       redirect("/error")
     }
   }
-   let slogan = "Frequent flyer exploring new destinations"
 
+  // get the user's bookings data <--- this can be alllot cleaner... works for now... clearly a knowledge gap
+  const {count, user_bookings} = await getUserBookingData(user.id)
+  const {bookings, bookingsError} = await getUserRecentBookings(user.id, 5)
+  //if (!user_bookings) {const bookings_data}
+
+
+  //console.log("this user's bookings: ", bookings)
+  
+  //console.log("The user's first name is: ", user_data.f_name) <-- debugging
+  
   return (
     <>
     <BookingsNavBar/>
@@ -41,6 +56,7 @@ export default async function UserAccountPage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className=" mx-auto">
         {/* Hero Section */}
+        
         <div className="bg-white rounded-3xl shadow-2xl overflow-hidden mb-12">
           <div className="bg-gradient-to-r from-blue-600 to-indigo-700 px-8 py-12 text-white relative overflow-hidden">
             <div className="absolute inset-0 bg-black/10" />
@@ -52,8 +68,8 @@ export default async function UserAccountPage() {
                 </div>
               </div>
               {/* add the acc user's name here!! */}
-              <h1 className="text-4xl md:text-5xl font-bold mb-3">{user.user_metadata.full_name}</h1>
-              <p className="text-xl opacity-90 mb-2">{user.email}</p>
+              <h1 className="text-4xl md:text-5xl font-bold mb-3">{user_data.f_name?  user_data.f_name + user_data.l_name: "Setup profile in settings"}</h1>
+              <p className="text-xl opacity-90 mb-2">{user_data.email}</p>
               <p className="text-lg max-w-2xl mx-auto opacity-95">
                 {slogan}
               </p>
@@ -71,7 +87,7 @@ export default async function UserAccountPage() {
                 <div className="flex justify-between items-center p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl">
                   <div>
                     <p className="text-sm font-medium text-gray-600">Flights Booked</p>
-                    <p className="text-3xl font-bold text-gray-900">12</p>
+                    <p className="text-3xl font-bold text-gray-900">{count}</p>
                   </div>
                   <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
                     ✈️
@@ -80,8 +96,8 @@ export default async function UserAccountPage() {
                 
                 <div className="p-4 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl">
                   <p className="text-sm font-medium text-gray-600 mb-1">Recent Flight</p>
-                  <p className="font-semibold text-gray-900">Tokyo, Japan</p>
-                  <p className="text-xs text-gray-500">Feb 15, 2026</p>
+                  <p className="font-semibold text-gray-900">{bookings[0]?.destination_name}</p>
+                  <p className="text-xs text-gray-500">{bookings[0]?.departure_date}</p>
                 </div>
               </div>
             </div>
@@ -119,9 +135,9 @@ export default async function UserAccountPage() {
                     ✈️
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold text-xl text-gray-900 truncate">Tokyo Narita (NRT)</h4>
-                    <p className="text-sm text-gray-600 mb-1">FL-1234</p>
-                    <p className="text-sm text-gray-500">Feb 15, 2026 • Confirmed</p>
+                    <h4 className="font-semibold text-xl text-gray-900 truncate">{bookings[0]?.destination_name}</h4>
+                    <p className="text-sm text-gray-600 mb-1">FL-{bookings[0]?.flight_id}</p>
+                    <p className="text-sm text-gray-500">{bookings[0]?.departure_date} • Confirmed</p>
                   </div>
                   <span className="px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-medium ml-6">
                     ACTIVE
@@ -152,13 +168,13 @@ export default async function UserAccountPage() {
                   <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
                     👤
                   </div>
-                  <span>Profile updated Feb 28, 2026</span>
+                  <span>Profile updated {user.updated_at}</span>
                 </div>
                 <div className="flex items-center p-3 bg-emerald-50 rounded-xl">
                   <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center mr-3">
                     ✈️
                   </div>
-                  <span>Booked flight to Tokyo</span>
+                  <span>Booked flight to {bookings[0]?.destination_name}</span>
                 </div>
               </div>
             </div>

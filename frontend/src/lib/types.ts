@@ -26,6 +26,20 @@ export const STATUS_CONFIG: Record<FlightStatus, { label: string; bg: string; te
 }
 
 
+export interface  UserType{
+  uuid: string,
+  f_name: string,
+  l_name: string,
+  email: string, 
+  phone:string,
+  date_of_brith: string,
+  passport_number: string,
+  rank: string
+  meal_preference: string
+  create_at: string
+  updated_at: string
+}
+
 /// Temporary types for the history...
 export type FlightStatus = "upcoming" | "completed" | "cancelled"
  
@@ -48,6 +62,18 @@ export interface Flight {
   price: string
 }
 
+
+export interface FlightDetails {
+  flight_id: number
+  flight_number: string
+  departure_time?: string
+  arrival_time?: string
+  status: string
+  origin: { name: string; airport_code: string; city: string }
+  destination: { name: string; airport_code: string; city: string }
+  plane?: { plane_name: string }
+  pricing?: { seat_class: string; base_price: number; seats_available: number } | null
+}
 // used for the user settings
 export interface SettingsSection {
   id: string

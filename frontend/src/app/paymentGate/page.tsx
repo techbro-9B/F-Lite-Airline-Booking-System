@@ -6,18 +6,21 @@ import { HomeNavBar } from "../homepage/components/HomeNavBar";
 import { useState, useEffect } from "react";
 import { sendData } from "./paymentServer"
 import { Button } from "@/components/ui/button";
+import {useRouter} from "next/navigation";
 
 export default function PaymentGateway() {
   const data: sessionData = getSessionData();
   const [isLoading, setIsLoading] = useState(true);
-
+const router = useRouter();
   useEffect(() => {
     let timer: NodeJS.Timeout
     
     sendData()
       .then(() => {
         timer = setTimeout(
-          () => setIsLoading(false),
+          () => {
+            setIsLoading(false)
+          },
           1000 + Math.random() * 1500
         );
       })
@@ -29,7 +32,7 @@ export default function PaymentGateway() {
   return (
     <>
       <HomeNavBar />
-      <div style={{ fontSize: 20, fontWeight: 500, position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)"}}>Please wait while we process your payment</div>
+      <div style={{ fontSize: 20, fontWeight: 500, position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)"}}>{isLoading ? "Please wait while we process your payment" : "Complete!"}</div>
 
         <div style={{
           display: "flex",
@@ -43,8 +46,15 @@ export default function PaymentGateway() {
         }}>
           {isLoading
             ? <LoadingDots />
-            : <Button style = {{width: "100%",
-          height: "100%",}} onClick={() => { /* handle next */ }}>
+            : <Button
+            
+            onClick={() => {
+              
+              router.push("../account");
+            }}
+            style = {{width: "100%",
+            height: "100%",
+            }}>
               Next
             </Button>
           }

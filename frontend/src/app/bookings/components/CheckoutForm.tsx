@@ -5,9 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useRouter } from "next/navigation";
 
 export default function CheckoutForm() {
     const { control } = useFormContext();
+    const router = useRouter()
 
     return (
         <div className="space-y-6">
@@ -86,7 +88,9 @@ export default function CheckoutForm() {
                 </CardContent>
             </Card>
 
-            <Button type="submit" className="w-full text-lg" size="lg">
+            <Button type="submit" className="w-full text-lg" size="lg" onClick={()=>{
+                router.push("/paymentGate")
+            }}>
                 Complete Booking
             </Button>
         </div>

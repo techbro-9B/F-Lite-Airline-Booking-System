@@ -15,7 +15,7 @@ import {
   FieldLabel,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { supabaseClientSide } from "@/lib/supabase/client"
+import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import Link from "next/link"
@@ -56,7 +56,7 @@ export function SignupForm({
 
     setLoading(true)
     // the logic that creates the user in supabase
-    const {data, error} = await supabaseClientSide.auth.signUp({
+    const {data, error} = await createClient().auth.signUp({
       email,
       password,
       options: {

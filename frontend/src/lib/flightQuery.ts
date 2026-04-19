@@ -90,6 +90,8 @@ export type flightFilter = {
 export type flightFilterResult = {
     destination: string,
     origin: string,
+    destCode: string,
+    originCode: string,
     seats: number,
     departsIn: number,
     departureFormattedDate: string,
@@ -237,6 +239,8 @@ async function getFilteredFlightData(
         planeName: plane.plane_name,
         cost: flight.cost,
         flightId: flight.flight_id,
+        destCode: destination.airport_code,
+        originCode: origin.airport_code,
       };
     })
   );
